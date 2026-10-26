@@ -51,6 +51,11 @@
           <div class="section-heading"><h2><span>03</span> 落款钤印</h2></div>
           <div class="field-pair colophon-pair"><label>篇尾落款<input id="colophon" maxlength="20" placeholder="留空使用作者"></label><label>印文<input id="seal" maxlength="4" value="自在" placeholder="留空不钤印"></label></div>
           <label class="seal-style-label">印式<select id="sealStyle"><option value="intaglio">白文印 · 朱地白字</option><option value="relief">朱文印 · 细边红字</option></select></label>
+          <div class="field-pair seal-style-label"><label>印章字体<select id="sealFont"><option value="seal">全字库说文解字 · 篆书</option><option value="kai">系统楷体</option><option value="song">系统宋体</option></select></label><label>印泥质感<select id="sealTexture"><option value="fresh">新钤 · 温润</option><option value="worn">古印 · 微残</option></select></label></div>
+          <button class="font-upload" id="sealFontImport" type="button"><span>＋ 导入印章字体</span><span>独立于正文</span></button><input type="file" id="sealFontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+          <p id="sealFontStatus" class="font-help" role="status">正在准备篆书字体…</p>
+          <div class="seal-proof"><canvas id="sealPreview" width="600" height="600" role="img" aria-label="印章放大预览"></canvas><div><strong>印面预览</strong><p id="sealLayoutHint">双字纵排</p><small>印章字体独立设置<br>留空印文可不钤印</small></div></div>
+          <p class="font-help font-attribution">篆书来源：数位发展部 · <a href="https://www.cns11643.gov.tw/" target="_blank" rel="noopener">CNS11643 全字库</a>。<a href="./fonts/NOTICE.txt" target="_blank" rel="noopener">来源与授权</a></p>
           <p class="font-help">题名最多 14 字，落款最多 20 字，印文最多 4 字。</p>
         </section>
       </aside>

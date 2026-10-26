@@ -1,6 +1,9 @@
 import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows, pageGeometry } from './layout.js';
 import { drawPage } from './renderer.js';
 import { PAPERS, paintPaper } from './paper.js';
+import { drawSeal } from './seal.js';
+import { fontCoverage } from './font-coverage.js';
+import { sealCoverage } from './fonts/seal-coverage.js';
 
 const $ = id => document.getElementById(id);
 const samples = {
@@ -8,9 +11,10 @@ const samples = {
   chibi: { title: '赤壁', author: '唐 · 杜牧', body: '折戟沉沙铁未销，自将磨洗认前朝。\n东风不与周郎便，铜雀春深锁二乔。' },
   lanting: { title: '兰亭集序', author: '晋 · 王羲之', body: '永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。群贤毕至，少长咸集。此地有崇山峻岭，茂林修竹，又有清流激湍，映带左右，引以为流觞曲水，列坐其次。虽无丝竹管弦之盛，一觞一咏，亦足以畅叙幽情。\n是日也，天朗气清，惠风和畅。仰观宇宙之大，俯察品类之盛，所以游目骋怀，足以极视听之娱，信可乐也。\n夫人之相与，俯仰一世。或取诸怀抱，悟言一室之内；或因寄所托，放浪形骸之外。虽趣舍万殊，静躁不同，当其欣于所遇，暂得于己，快然自足，不知老之将至。及其所之既倦，情随事迁，感慨系之矣。' }
 };
-const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle'];
+const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle', 'sealFont', 'sealTexture'];
 let seed = 915, pageIndex = 0, layout, settings, timer, toastTimer;
 let loadedFont = null, fontRequest = 0, busy = false;
+let sealReady = false, sealLoading = true, customSealFont = null, customSealCoverage = null, sealFontRequest = 0;
 const canvas = $('artwork');
 
 function toast(message, error = false) {
@@ -49,15 +53,16 @@ function restoreDraft() {
 
 function saveDraft() {
   try {
-    localStorage.setItem('zizai-shufa-v1', JSON.stringify({ ...settings, rows: $('rows').value, font: settings.font === 'custom' ? 'kai' : settings.font }));
+    localStorage.setItem('zizai-shufa-v1', JSON.stringify({ ...settings, rows: $('rows').value, font: settings.font === 'custom' ? 'kai' : settings.font, sealFont: settings.sealFont === 'custom' ? 'kai' : settings.sealFont }));
     $('saveStatus').textContent = '已保存至本机';
   } catch { $('saveStatus').textContent = '草稿未保存'; }
 }
 
 function syncButtons() {
   const empty = !layout?.pages.length;
-  $('download').disabled = empty || busy;
-  $('print').disabled = empty || busy;
+  const awaitingFont = !!settings?.seal.trim() && settings.sealFont === 'seal' && sealLoading;
+  $('download').disabled = empty || busy || awaitingFont;
+  $('print').disabled = empty || busy || awaitingFont;
   $('previousPage').disabled = empty || pageIndex === 0 || busy;
   $('nextPage').disabled = empty || pageIndex >= layout.pages.length - 1 || busy;
 }
@@ -76,6 +81,25 @@ function renderCurrentPage() {
 function update() {
   clearTimeout(timer);
   settings = readSettings();
+  const sealChars = characters(settings.seal, true).slice(0, 4);
+  const coverage = settings.sealFont === 'seal' ? sealCoverage : settings.sealFont === 'custom' ? customSealCoverage : null;
+  const missing = coverage ? sealChars.filter(char => !coverage.has(char.codePointAt(0))) : [];
+  settings.sealRenderFont = settings.sealFont;
+  let sealStatus = settings.sealFont === 'custom' ? '已导入独立印章字体，刷新后需重新导入。' : '印章字体与正文独立设置。';
+  if (settings.sealFont === 'seal') {
+    sealStatus = '篆书字体已就绪。';
+    if (!sealReady) { settings.sealRenderFont = 'kai'; sealStatus = sealLoading ? '正在加载篆书，预览暂用楷体；就绪后可导出。' : '篆书加载失败，整方暂用楷体；可刷新或导入字体。'; }
+  }
+  if (missing.length && (settings.sealFont !== 'seal' || sealReady)) {
+    settings.sealRenderFont = 'kai'; sealStatus = `当前字体缺「${[...new Set(missing)].join('、')}」，整方暂用楷体。可调整印文或导入字体。`;
+  }
+  $('sealFontStatus').textContent = sealStatus;
+  $('sealFontStatus').classList.toggle('font-warning', missing.length > 0 || (settings.sealFont === 'seal' && !sealLoading && !sealReady));
+  $('sealLayoutHint').textContent = ['不钤印', '单字居中', '双字纵排', '三字：右一大，左两小', '四字：右起纵读'][sealChars.length];
+  const proof = $('sealPreview');
+  if (sealChars.length) drawSeal(proof, sealChars, settings);
+  else proof.getContext('2d').clearRect(0, 0, proof.width, proof.height);
+  proof.setAttribute('aria-label', `印章「${sealChars.join('')}」放大预览`);
   const geometry = pageGeometry(settings);
   canvas.style.aspectRatio = `1600 / ${geometry.height}`;
   $('exportDimensions').textContent = `高清 PNG · 2400 × ${Math.round(geometry.height * 1.5)} 像素`;
@@ -146,6 +170,27 @@ $('fontFile').addEventListener('change', async e => {
   finally { e.target.value = ''; }
 });
 
+$('sealFontImport').addEventListener('click', () => $('sealFontFile').click());
+$('sealFontFile').addEventListener('change', async e => {
+  const file = e.target.files?.[0]; if (!file) return;
+  const request = ++sealFontRequest;
+  if (file.size > 30 * 1024 * 1024) { toast('请导入 30 MB 以内的印章字体。', true); e.target.value = ''; return; }
+  try {
+    const buffer = await file.arrayBuffer();
+    const face = new FontFace('ShufaSealCustom', buffer); await face.load();
+    if (request !== sealFontRequest) return;
+    let coverage = null;
+    try { coverage = fontCoverage(buffer); } catch { /* WOFF or unusual cmap: inspect the proof visually. */ }
+    if (customSealFont) document.fonts.delete(customSealFont);
+    document.fonts.add(face); customSealFont = face; customSealCoverage = coverage;
+    let option = $('sealFont').querySelector('option[value="custom"]');
+    if (!option) { option = document.createElement('option'); option.value = 'custom'; $('sealFont').append(option); }
+    option.textContent = file.name; $('sealFont').value = 'custom'; update();
+    toast(coverage ? '印章字体已更新，正文保持原字体。' : '印章字体已加载，请核对印面字形。');
+  } catch { toast('印章字体无法读取，请选择有效字体文件。', true); }
+  finally { e.target.value = ''; }
+});
+
 async function withExport(action) {
   update();
   if (!layout?.pages.length || busy) return;
@@ -190,3 +235,5 @@ $('print').addEventListener('click', () => withExport(async () => {
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
 restoreDraft(); update();
 document.fonts.ready.then(renderCurrentPage);
+const builtinSeal = new FontFace('CNSSeal', `url("${new URL('./fonts/CNS-ShuoWen.ttf', import.meta.url).href}")`);
+builtinSeal.load().then(face => { document.fonts.add(face); sealReady = true; }).catch(() => { sealReady = false; }).finally(() => { sealLoading = false; update(); });

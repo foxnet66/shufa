@@ -1,0 +1,14 @@
+全字庫說文解字 / CNS11643 ShuoWen font
+
+來源：數位發展部，CNS11643 中文標準交換碼全字庫網站
+https://www.cns11643.gov.tw/
+字型官方下載說明：https://www.cns11643.gov.tw/downloadList.jsp?ID=2&ID2=20
+下載檔名：ebas927.ttf；此處以 CNS-ShuoWen.ttf 保存，未修改字型內容。
+
+授權說明：https://www.cns11643.gov.tw/pageView.jsp?ID=59&SN=&la=0&lang=tw
+政府資料開放授權條款第 1 版：https://data.gov.tw/license
+
+官方授權聲明允許無償、非專屬、不限時間及地域之重製、編輯、公開傳輸及其他利用；公開發行、展示或利用字型產生之加值產品，須適當標示來源。
+本網站在印章設定區提供可見來源標示，並隨字型保留本說明。
+
+官方下載頁說明：本字型收錄 6721 字；現代漢字與說文篆字並非完整一對一對應。字形僅供數位排印參考，不作古文字考證或篆刻真跡保證。

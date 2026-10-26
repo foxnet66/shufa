@@ -1,5 +1,6 @@
 import { random, characters, signaturePosition, pageGeometry, verticalCenters } from './layout.js';
 import { paintPaper } from './paper.js';
+import { drawSeal } from './seal.js';
 
 export const FONT_FAMILIES = {
   kai: 'KaiTi, STKaiti, "Kaiti SC", "楷体", serif',
@@ -28,36 +29,9 @@ function opticalGlyph(ctx, char, maxWidth) {
 
 const verticalForms = { '（': '︵', '）': '︶', '《': '︽', '》': '︾', '「': '﹁', '」': '﹂', '『': '﹃', '』': '﹄', '—': '︱', '…': '︙' };
 
-function stamp(ctx, signature, font, style, seed) {
+function stamp(ctx, signature, settings) {
   const plate = document.createElement('canvas'); plate.width = plate.height = 600;
-  const ink = plate.getContext('2d'), rng = random(seed ^ 0x5a71);
-  ink.fillStyle = '#a03c2f'; ink.strokeStyle = '#a03c2f';
-  ink.beginPath();
-  const corners = [[18, 18], [582, 18], [582, 582], [18, 582]];
-  corners.forEach(([x, y], side) => {
-    const next = corners[(side + 1) % 4];
-    for (let i = 0; i < 18; i++) {
-      const t = i / 18, px = x + (next[0] - x) * t + (rng() - .5) * 5, py = y + (next[1] - y) * t + (rng() - .5) * 5;
-      if (!side && !i) ink.moveTo(px, py); else ink.lineTo(px, py);
-    }
-  });
-  ink.closePath();
-  if (style === 'relief') { ink.lineWidth = 19; ink.stroke(); }
-  else { ink.fill(); ink.globalCompositeOperation = 'destination-out'; }
-  const chars = signature.sealChars, oneColumn = chars.length <= 2;
-  const fontSize = chars.length === 1 ? 400 : 235;
-  chars.forEach((char, i) => {
-    ink.save();
-    ink.translate(oneColumn ? 300 : (i < 2 ? 440 : 160), oneColumn ? (chars.length === 1 ? 300 : 155 + i * 290) : 155 + (i % 2) * 290);
-    ink.font = `${fontSize}px ${font}`;
-    opticalGlyph(ink, char, oneColumn ? 460 : 240);
-    ink.restore();
-  });
-  ink.globalCompositeOperation = 'destination-out';
-  for (let i = 0; i < 420; i++) {
-    ink.fillStyle = `rgba(0,0,0,${.15 + rng() * .6})`;
-    ink.fillRect(rng() * 600, rng() * 600, 1 + rng() * 4, 1 + rng() * 6);
-  }
+  drawSeal(plate, signature.sealChars, settings);
   ctx.save(); ctx.translate(signature.x, signature.sealY); ctx.rotate(-.016);
   ctx.globalAlpha = .92;
   ctx.drawImage(plate, -signature.sealSize / 2, -signature.sealSize / 2, signature.sealSize, signature.sealSize);
@@ -124,7 +98,7 @@ export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1
   const signature = signaturePosition(page, settings, pageIndex === pageCount - 1);
   vertical(ctx, signature.noteChars.join(''), signature.x, signature.y, signature.noteSize, signature.step, font, '#514438', 20);
   if (signature.sealChars.length) {
-    stamp(ctx, signature, font, settings.sealStyle, settings.seed);
+    stamp(ctx, signature, settings);
   }
   if (pageCount > 1) {
     ctx.font = `23px ${FONT_FAMILIES.song}`;
