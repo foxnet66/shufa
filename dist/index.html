@@ -35,12 +35,14 @@
         </section>
         <section class="editor-section">
           <div class="section-heading"><h2><span>02</span> 选纸与字</h2></div>
-          <fieldset><legend>纸面章法</legend><div class="paper-options"><label class="paper-option"><input type="radio" name="style" value="clean" checked><span class="paper-swatch clean"><i>永</i></span><span>素笺<small>留白见意</small></span></label><label class="paper-option"><input type="radio" name="style" value="ruled"><span class="paper-swatch ruled"><i>永</i></span><span>乌丝栏<small>落笔有度</small></span></label></div></fieldset>
+          <label class="composition-preset">册页范式<select id="composition"><option value="album">诗文册页 · 右列题款</option><option value="free">舒朗长笺 · 随文落款</option></select></label>
+          <fieldset><legend>纸面章法</legend><div class="paper-options"><label class="paper-option"><input type="radio" name="style" value="clean"><span class="paper-swatch clean"><i>永</i></span><span>素笺<small>留白见意</small></span></label><label class="paper-option"><input type="radio" name="style" value="ruled" checked><span class="paper-swatch ruled"><i>永</i></span><span>乌丝栏<small>落笔有度</small></span></label></div></fieldset>
           <fieldset class="paper-materials"><legend>选一纸质地</legend><input type="hidden" id="paper" value="warm"><div class="material-options"><button type="button" data-paper="warm" aria-pressed="true"><canvas width="90" height="110" aria-hidden="true"></canvas><span>暖米生宣</span><small>温润 · 细纤维</small></button><button type="button" data-paper="white" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>月白熟宣</span><small>清洁 · 细密纹</small></button><button type="button" data-paper="aged" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>淡茶旧笺</span><small>浅茶 · 微旧化</small></button></div><p class="font-help" id="paperDescription">温润米白，细长纤维；宜清润小楷。</p></fieldset>
           <label>书写字体<select id="font"><option value="kai">系统楷体</option><option value="song">系统宋体</option><option value="fang">系统仿宋</option></select></label>
           <button class="font-upload" id="fontImport" type="button"><span>＋ 导入自己的字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
           <p class="font-help" id="fontHelp">使用设备已安装的字体；导入字体仅在本次会话有效，请确认使用权。</p>
-          <div class="field-pair"><label>列数<select id="columns"><option value="8">8 列 · 疏朗</option><option value="10" selected>10 列 · 均衡</option><option value="12">12 列 · 紧凑</option></select></label><label>每列字数<select id="rows"><option value="12">12 字</option><option value="14">14 字</option><option value="16" selected>16 字</option><option value="20">20 字</option></select></label></div>
+          <div class="field-pair"><label>列数<select id="columns"><option value="8">8 列 · 疏朗</option><option value="10" selected>10 列 · 均衡</option><option value="12">12 列 · 紧凑</option></select></label><label>每列字数<select id="rows"><option value="auto" selected>随体裁自动</option><option value="12">12 字</option><option value="14">14 字</option><option value="15">15 字</option><option value="16">16 字</option><option value="20">20 字</option></select></label></div>
+          <p id="layoutDescription" class="font-help">五言 15 字，七言 14 字；右列题名、落款与钤印。</p>
           <div class="field-pair composition-options"><label>行文方式<select id="lineMode"><option value="flow">连续竖排</option><option value="lines">按原文换行分列</option></select></label><label>墨色<select id="ink"><option value="balanced">清润</option><option value="dense">浓墨</option><option value="light">淡墨</option></select></label></div>
           <p class="font-help composition-help">诗词可按原文换列；过长的一行会自动接列，空行不占列。纸张为数字质感模拟。</p>
           <label class="checkbox natural"><input type="checkbox" id="natural" checked>自然墨色<span>轻微浓淡与错落</span></label>
@@ -48,6 +50,7 @@
         <section class="editor-section last-section">
           <div class="section-heading"><h2><span>03</span> 落款钤印</h2></div>
           <div class="field-pair colophon-pair"><label>篇尾落款<input id="colophon" maxlength="20" placeholder="留空使用作者"></label><label>印文<input id="seal" maxlength="4" value="自在" placeholder="留空不钤印"></label></div>
+          <label class="seal-style-label">印式<select id="sealStyle"><option value="intaglio">白文印 · 朱地白字</option><option value="relief">朱文印 · 细边红字</option></select></label>
           <p class="font-help">题名最多 14 字，落款最多 20 字，印文最多 4 字。</p>
         </section>
       </aside>
@@ -55,7 +58,7 @@
         <div class="workspace-toolbar"><div><span class="preview-dot"></span> 册页预览 <span class="quiet live-label">实时排版</span></div><button id="newInk" class="text-button" type="button"><span aria-hidden="true">↻</span> 换一纸墨色</button></div>
         <div class="paper-stage"><div class="paper-mat"><canvas id="artwork" width="1600" height="2000" role="img" aria-label="山居秋暝书法预览"></canvas><div id="emptyState" class="empty-state" hidden><span>一纸待书</span><p>在左侧写下文字，作品即刻呈现。</p></div></div></div>
         <div class="preview-footer"><span id="pageInfo">正文 40 字 · 每页可容 128 字</span><nav class="pagination" aria-label="作品翻页"><button id="previousPage" type="button" aria-label="上一页">←</button><span id="pageNumber" aria-live="polite">01 / 01</span><button id="nextPage" type="button" aria-label="下一页">→</button></nav></div>
-        <div class="export-bar"><div><h2>把这一页，留给自己。</h2><p>高清 PNG · 2400 × 3000 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇存 PDF <span aria-hidden="true">↗</span></button><button id="download" class="primary-button" type="button">下载当前页 <span aria-hidden="true">↓</span></button></div></div>
+        <div class="export-bar"><div><h2>把这一页，留给自己。</h2><p id="exportDimensions">高清 PNG · 2400 × 2640 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇存 PDF <span aria-hidden="true">↗</span></button><button id="download" class="primary-button" type="button">下载当前页 <span aria-hidden="true">↓</span></button></div></div>
         <p class="print-help">PDF 将打开系统打印窗口，选择「另存为 PDF」。建议关闭页眉页脚。</p>
       </section>
     </div>

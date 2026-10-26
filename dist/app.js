@@ -1,4 +1,4 @@
-import { paginate, characters, MAX_CHARACTERS, safeFilename } from './layout.js';
+import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows, pageGeometry } from './layout.js';
 import { drawPage } from './renderer.js';
 import { PAPERS, paintPaper } from './paper.js';
 
@@ -8,7 +8,7 @@ const samples = {
   chibi: { title: '赤壁', author: '唐 · 杜牧', body: '折戟沉沙铁未销，自将磨洗认前朝。\n东风不与周郎便，铜雀春深锁二乔。' },
   lanting: { title: '兰亭集序', author: '晋 · 王羲之', body: '永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。群贤毕至，少长咸集。此地有崇山峻岭，茂林修竹，又有清流激湍，映带左右，引以为流觞曲水，列坐其次。虽无丝竹管弦之盛，一觞一咏，亦足以畅叙幽情。\n是日也，天朗气清，惠风和畅。仰观宇宙之大，俯察品类之盛，所以游目骋怀，足以极视听之娱，信可乐也。\n夫人之相与，俯仰一世。或取诸怀抱，悟言一室之内；或因寄所托，放浪形骸之外。虽趣舍万殊，静躁不同，当其欣于所遇，暂得于己，快然自足，不知老之将至。及其所之既倦，情随事迁，感慨系之矣。' }
 };
-const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink'];
+const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle'];
 let seed = 915, pageIndex = 0, layout, settings, timer, toastTimer;
 let loadedFont = null, fontRequest = 0, busy = false;
 const canvas = $('artwork');
@@ -22,7 +22,7 @@ function toast(message, error = false) {
 
 function readSettings() {
   const data = Object.fromEntries(fields.map(id => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
-  return { ...data, columns: Number(data.columns), rows: Number(data.rows), keepPunctuation: data.punctuation, style: document.querySelector('input[name="style"]:checked').value, seed };
+  return { ...data, columns: Number(data.columns), rows: data.rows === 'auto' ? verseRows(data.body).rows : Number(data.rows), keepPunctuation: data.punctuation, style: document.querySelector('input[name="style"]:checked').value, seed };
 }
 
 function restoreDraft() {
@@ -39,6 +39,9 @@ function restoreDraft() {
       }
     }
     if (saved.style === 'clean' || saved.style === 'ruled') document.querySelector(`input[name="style"][value="${saved.style}"]`).checked = true;
+    if (!saved.composition) {
+      $('composition').value = 'album'; $('rows').value = 'auto'; $('lineMode').value = 'flow';
+    }
     if (Number.isSafeInteger(saved.seed)) seed = saved.seed;
     $('saveStatus').textContent = '已恢复本机草稿';
   } catch { $('saveStatus').textContent = '本机草稿不可用'; }
@@ -46,7 +49,7 @@ function restoreDraft() {
 
 function saveDraft() {
   try {
-    localStorage.setItem('zizai-shufa-v1', JSON.stringify({ ...settings, font: settings.font === 'custom' ? 'kai' : settings.font }));
+    localStorage.setItem('zizai-shufa-v1', JSON.stringify({ ...settings, rows: $('rows').value, font: settings.font === 'custom' ? 'kai' : settings.font }));
     $('saveStatus').textContent = '已保存至本机';
   } catch { $('saveStatus').textContent = '草稿未保存'; }
 }
@@ -73,6 +76,11 @@ function renderCurrentPage() {
 function update() {
   clearTimeout(timer);
   settings = readSettings();
+  const geometry = pageGeometry(settings);
+  canvas.style.aspectRatio = `1600 / ${geometry.height}`;
+  $('exportDimensions').textContent = `高清 PNG · 2400 × ${Math.round(geometry.height * 1.5)} 像素`;
+  const genre = verseRows(settings.body).genre;
+  $('layoutDescription').textContent = `${$('rows').value === 'auto' ? genre + ' · 自动' : '自定'} ${settings.columns} 列 × ${settings.rows} 字；${settings.composition === 'album' ? '右列题名、落款与钤印' : '落款跟随正文末列'}。`;
   document.querySelectorAll('[data-paper]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.paper === settings.paper)));
   $('paperDescription').textContent = (PAPERS[settings.paper] || PAPERS.warm).description;
   document.querySelectorAll('[data-sample]').forEach(button => {
@@ -105,10 +113,14 @@ document.querySelectorAll('[data-paper]').forEach(button => {
 document.querySelectorAll('[data-sample]').forEach(button => button.addEventListener('click', () => {
   const sample = samples[button.dataset.sample];
   for (const field of ['title', 'author', 'body']) $(field).value = sample[field];
-  $('lineMode').value = button.dataset.sample === 'lanting' ? 'flow' : 'lines';
+  $('lineMode').value = settings.composition === 'album' || button.dataset.sample === 'lanting' ? 'flow' : 'lines';
   pageIndex = 0; update();
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
 }));
+$('composition').addEventListener('change', () => {
+  $('rows').value = $('composition').value === 'album' ? 'auto' : '16';
+  $('lineMode').value = 'flow'; pageIndex = 0; update();
+});
 $('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
 $('previousPage').addEventListener('click', () => { if (pageIndex > 0) { pageIndex--; renderCurrentPage(); } });
 $('nextPage').addEventListener('click', () => { if (pageIndex < layout.pages.length - 1) { pageIndex++; renderCurrentPage(); } });

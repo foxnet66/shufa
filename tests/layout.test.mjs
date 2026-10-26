@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paginate, characters, safeFilename, signaturePosition } from '../dist/layout.js';
+import { paginate, characters, safeFilename, signaturePosition, verseRows, pageGeometry, verticalCenters } from '../dist/layout.js';
 
 test('long text is preserved across pages in right-to-left column order', () => {
   const text = Array.from({ length: 397 }, (_, i) => String.fromCodePoint(0x4e00 + i)).join('');
@@ -49,4 +49,29 @@ test('signature follows sparse text and only final pages carry a seal', () => {
   const long = signaturePosition(full, { ...settings, rows: 12, colophon: '春'.repeat(20) }, true);
   assert.ok(long.y >= 180);
   assert.ok(long.sealY + long.sealSize / 2 <= 1770);
+});
+
+test('album reserves only the inscription column and keeps text complete', () => {
+  const settings = { composition: 'album', columns: 10, rows: 15, title: '山居秋暝', author: '王维', seal: '自在' };
+  const layout = paginate('春'.repeat(136), settings);
+  assert.equal(layout.capacity, 135);
+  assert.deepEqual(layout.pages.map(p => p.characters.length), [135, 1]);
+  const position = signaturePosition(layout.pages[1], settings, true);
+  assert.ok(position.x > 1300);
+  assert.ok(position.y > 500 && position.sealY < 1600);
+  assert.equal(pageGeometry(settings).height, 1760);
+  assert.equal(pageGeometry({}).height, 2000);
+});
+
+test('verse classification chooses five or seven character layouts conservatively', () => {
+  assert.equal(verseRows('空山新雨后，天气晚来秋。明月松间照，清泉石上流。').rows, 15);
+  assert.equal(verseRows('折戟沉沙铁未销，自将磨洗认前朝。东风不与周郎便，铜雀春深锁二乔。').rows, 14);
+  assert.equal(verseRows('这是散文，长短句子不一。').genre, '诗文');
+});
+
+test('optical vertical spacing remains ordered within the writing area', () => {
+  const centers = verticalCenters([70, 8, 65, 55, 73], 100, 116);
+  assert.ok(centers.every((y, i) => i === 0 || y > centers[i - 1]));
+  assert.ok(centers[0] >= 116 && centers.at(-1) < 616);
+  assert.notEqual(Math.round(centers[1] - centers[0]), Math.round(centers[3] - centers[2]));
 });
