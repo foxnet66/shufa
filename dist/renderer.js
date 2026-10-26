@@ -1,4 +1,5 @@
-import { random, characters } from './layout.js';
+import { random, characters, signaturePosition } from './layout.js';
+import { paintPaper } from './paper.js';
 
 export const FONT_FAMILIES = {
   kai: 'KaiTi, STKaiti, "Kaiti SC", "楷体", serif',
@@ -13,6 +14,20 @@ function vertical(ctx, text, x, y, size, step, font, color, limit) {
   for (const [i, char] of characters(text, true).slice(0, limit).entries()) ctx.fillText(char, x, y + step * i);
 }
 
+// Center the visible ink rather than the font's em box (especially 一、川、心).
+function opticalGlyph(ctx, char, maxWidth) {
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  const m = ctx.measureText(char);
+  const inkWidth = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+  const scale = inkWidth > maxWidth ? maxWidth / inkWidth : 1;
+  ctx.scale(scale, 1);
+  ctx.fillText(char, (m.actualBoundingBoxLeft - m.actualBoundingBoxRight) / 2,
+    (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
+}
+
+const verticalForms = { '（': '︵', '）': '︶', '《': '︽', '》': '︾', '「': '﹁', '」': '﹂', '『': '﹃', '』': '﹄', '—': '︱', '…': '︙' };
+
 export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1600) {
   canvas.width = width;
   canvas.height = width * 1.25;
@@ -20,18 +35,7 @@ export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1
   ctx.scale(width / 1600, width / 1600);
   const rng = random(settings.seed + pageIndex * 271);
   const cool = settings.paper === 'white';
-  ctx.fillStyle = cool ? '#f8f7f0' : '#f1e7cd';
-  ctx.fillRect(0, 0, 1600, 2000);
-  const wash = ctx.createLinearGradient(0, 0, 1600, 2000);
-  wash.addColorStop(0, 'rgba(255,255,255,.25)');
-  wash.addColorStop(.6, 'rgba(158,121,65,.015)');
-  wash.addColorStop(1, 'rgba(126,93,42,.055)');
-  ctx.fillStyle = wash;
-  ctx.fillRect(0, 0, 1600, 2000);
-  for (let i = 0; i < 12500; i++) {
-    ctx.fillStyle = `rgba(102,76,41,${rng() * .045})`;
-    ctx.fillRect(rng() * 1600, rng() * 2000, rng() * 2 + .3, rng() * 4 + .3);
-  }
+  paintPaper(ctx, settings.paper, settings.seed + pageIndex * 271);
 
   const left = 132, right = 1468, top = 180, bottom = 1770;
   const cw = (right - left) / settings.columns;
@@ -60,38 +64,39 @@ export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1
   vertical(ctx, title, right - cw / 2, top + rh * 1.5, Math.min(titleSize, titleStep * .85), titleStep, font, '#302b24', 14);
   page.columns.forEach((column, i) => {
     const x = right - (i + 1.5) * cw;
+    const phase = rng() * Math.PI * 2;
+    const baseInk = settings.ink === 'light' ? .7 : settings.ink === 'dense' ? .99 : .91;
+    const columnInk = baseInk - (settings.natural ? rng() * .035 : 0);
     column.forEach((char, j) => {
       const variation = settings.natural ? 1 : 0;
+      const smallMark = /^[，。、；：！？,.!?;:]$/u.test(char);
       ctx.save();
-      ctx.translate(x + (rng() - .5) * size * .032 * variation, top + (j + .5) * rh + (rng() - .5) * size * .025 * variation);
+      ctx.translate(x + (rng() - .5) * size * .026 * variation + (smallMark ? cw * .21 : 0), top + (j + .5) * rh + (rng() - .5) * size * .02 * variation - (smallMark ? rh * .2 : 0));
       ctx.rotate((rng() - .5) * .022 * variation);
-      ctx.fillStyle = `rgba(35,32,27,${settings.natural ? .84 + rng() * .13 : .96})`;
-      ctx.font = `${size * (1 + (rng() - .5) * .035 * variation)}px ${font}`;
-      ctx.fillText(char, 0, 0, cw * .88);
+      ctx.fillStyle = `rgba(35,32,27,${columnInk + Math.sin(phase + j * .55) * .025 * variation})`;
+      ctx.font = `${size * (smallMark ? .52 : 1) * (1 + Math.sin(phase + j * .7) * .012 * variation + (rng() - .5) * .014 * variation)}px ${font}`;
+      opticalGlyph(ctx, verticalForms[char] || char, cw * .88);
       ctx.restore();
     });
   });
-  const note = pageIndex === pageCount - 1 ? (settings.colophon || settings.author) : '未完待續';
-  const noteChars = characters(note, true).slice(0, 20);
-  const noteSize = size * .49;
-  const noteStep = Math.min(rh * .65, 65);
-  const sealY = bottom - 76;
-  const noteY = Math.max(top + rh * 1.5, sealY - 80 - noteChars.length * noteStep);
-  vertical(ctx, noteChars.join(''), left + cw / 2, noteY, noteSize, noteStep, font, '#514438', 20);
-  if (settings.seal) {
+  const signature = signaturePosition(page, settings, pageIndex === pageCount - 1);
+  vertical(ctx, signature.noteChars.join(''), signature.x, signature.y, signature.noteSize, signature.step, font, '#514438', 20);
+  if (signature.sealChars.length) {
     ctx.save();
-    const sealSize = Math.min(87, cw * .75), x = left + cw / 2;
-    ctx.translate(x, sealY); ctx.rotate(-.022);
-    ctx.strokeStyle = '#a43d2e'; ctx.fillStyle = '#a43d2e'; ctx.lineWidth = 4;
+    const { sealSize } = signature;
+    ctx.translate(signature.x, signature.sealY); ctx.rotate(-.022);
+    ctx.strokeStyle = '#a43d2e'; ctx.fillStyle = '#a43d2e'; ctx.lineWidth = 3.2;
     ctx.strokeRect(-sealSize / 2, -sealSize / 2, sealSize, sealSize);
-    const chars = characters(settings.seal, true).slice(0, 4);
+    const chars = signature.sealChars;
     const one = chars.length <= 2;
     ctx.font = `${sealSize * (chars.length === 1 ? .59 : .39)}px ${font}`;
     chars.forEach((c, i) => ctx.fillText(c, one ? 0 : (i < 2 ? .23 : -.23) * sealSize, one ? (i - (chars.length - 1) / 2) * sealSize * .53 : (i % 2 ? .23 : -.23) * sealSize));
     ctx.restore();
   }
-  ctx.font = `23px ${FONT_FAMILIES.song}`;
-  ctx.fillStyle = 'rgba(100,80,55,.55)';
-  ctx.fillText(`${pageIndex + 1} / ${pageCount}`, 800, 1878);
+  if (pageCount > 1) {
+    ctx.font = `23px ${FONT_FAMILIES.song}`;
+    ctx.fillStyle = 'rgba(100,80,55,.45)';
+    ctx.fillText(`${pageIndex + 1} / ${pageCount}`, 800, 1878);
+  }
   return canvas;
 }

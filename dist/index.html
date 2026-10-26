@@ -31,15 +31,18 @@
 明月松间照，清泉石上流。
 竹喧归浣女，莲动下渔舟。
 随意春芳歇，王孙自可留。</textarea>
-          <div class="body-footer"><span>连续竖排 · 长文自动分页</span><label class="checkbox"><input id="punctuation" type="checkbox">保留标点</label></div>
+          <div class="body-footer"><span id="flowHint">连续竖排 · 长文自动分页</span><label class="checkbox"><input id="punctuation" type="checkbox">保留标点</label></div>
         </section>
         <section class="editor-section">
           <div class="section-heading"><h2><span>02</span> 选纸与字</h2></div>
           <fieldset><legend>纸面章法</legend><div class="paper-options"><label class="paper-option"><input type="radio" name="style" value="clean" checked><span class="paper-swatch clean"><i>永</i></span><span>素笺<small>留白见意</small></span></label><label class="paper-option"><input type="radio" name="style" value="ruled"><span class="paper-swatch ruled"><i>永</i></span><span>乌丝栏<small>落笔有度</small></span></label></div></fieldset>
-          <div class="field-pair"><label>书写字体<select id="font"><option value="kai">系统楷体</option><option value="song">系统宋体</option><option value="fang">系统仿宋</option></select></label><label>宣纸色调<select id="paper"><option value="warm">暖米宣</option><option value="white">月白宣</option></select></label></div>
+          <fieldset class="paper-materials"><legend>选一纸质地</legend><input type="hidden" id="paper" value="warm"><div class="material-options"><button type="button" data-paper="warm" aria-pressed="true"><canvas width="90" height="110" aria-hidden="true"></canvas><span>暖米生宣</span><small>温润 · 细纤维</small></button><button type="button" data-paper="white" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>月白熟宣</span><small>清洁 · 细密纹</small></button><button type="button" data-paper="aged" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>淡茶旧笺</span><small>浅茶 · 微旧化</small></button></div><p class="font-help" id="paperDescription">温润米白，细长纤维；宜清润小楷。</p></fieldset>
+          <label>书写字体<select id="font"><option value="kai">系统楷体</option><option value="song">系统宋体</option><option value="fang">系统仿宋</option></select></label>
           <button class="font-upload" id="fontImport" type="button"><span>＋ 导入自己的字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
           <p class="font-help" id="fontHelp">使用设备已安装的字体；导入字体仅在本次会话有效，请确认使用权。</p>
           <div class="field-pair"><label>列数<select id="columns"><option value="8">8 列 · 疏朗</option><option value="10" selected>10 列 · 均衡</option><option value="12">12 列 · 紧凑</option></select></label><label>每列字数<select id="rows"><option value="12">12 字</option><option value="14">14 字</option><option value="16" selected>16 字</option><option value="20">20 字</option></select></label></div>
+          <div class="field-pair composition-options"><label>行文方式<select id="lineMode"><option value="flow">连续竖排</option><option value="lines">按原文换行分列</option></select></label><label>墨色<select id="ink"><option value="balanced">清润</option><option value="dense">浓墨</option><option value="light">淡墨</option></select></label></div>
+          <p class="font-help composition-help">诗词可按原文换列；过长的一行会自动接列，空行不占列。纸张为数字质感模拟。</p>
           <label class="checkbox natural"><input type="checkbox" id="natural" checked>自然墨色<span>轻微浓淡与错落</span></label>
         </section>
         <section class="editor-section last-section">

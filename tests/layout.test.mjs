@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paginate, characters, safeFilename } from '../dist/layout.js';
+import { paginate, characters, safeFilename, signaturePosition } from '../dist/layout.js';
 
 test('long text is preserved across pages in right-to-left column order', () => {
   const text = Array.from({ length: 397 }, (_, i) => String.fromCodePoint(0x4e00 + i)).join('');
@@ -28,4 +28,25 @@ test('invalid or oversized input is rejected instead of truncated', () => {
 test('export filenames cannot introduce paths', () => {
   assert.equal(safeFilename('../春江:夜?'), '..春江夜');
   assert.equal(safeFilename(' /:*? '), '自在小楷');
+});
+
+test('verse lines retain column breaks, wrap long lines, and preserve every character', () => {
+  const text = '空山新雨后，天气晚来秋。\n\n明月松间照，清泉石上流。\n' + '春'.repeat(30);
+  const layout = paginate(text, { columns: 6, rows: 12, lineMode: 'lines' });
+  assert.deepEqual(layout.pages.map(p => p.columns.map(c => c.length)), [[10, 10, 12, 12], [6]]);
+  assert.equal(layout.pages.flatMap(p => p.columns.flat()).join(''), characters(text).join(''));
+  assert.equal(layout.pages[1].offset, 44);
+});
+
+test('signature follows sparse text and only final pages carry a seal', () => {
+  const settings = { columns: 10, rows: 16, author: '王维', seal: '自在' };
+  const sparse = paginate('春'.repeat(20), settings).pages[0];
+  const full = paginate('春'.repeat(128), settings).pages[0];
+  const a = signaturePosition(sparse, settings, true), b = signaturePosition(full, settings, true);
+  assert.ok(a.x > b.x, 'sparse signature should follow text rather than sit on the far left');
+  assert.ok(a.sealY < 1770 && b.sealY < 1770);
+  assert.deepEqual(signaturePosition(full, settings, false).sealChars, []);
+  const long = signaturePosition(full, { ...settings, rows: 12, colophon: '春'.repeat(20) }, true);
+  assert.ok(long.y >= 180);
+  assert.ok(long.sealY + long.sealSize / 2 <= 1770);
 });
