@@ -1,5 +1,7 @@
 # 自在小楷
 
+Fox 的纸墨小铺：以用户的狐狸吉祥物 Fox 为主角，使用狐狸橙、奶油纸色和深棕书桌形成品牌界面。稿本分为「写字 / 选纸 / 钤印」三步，支持键盘切换；点击 Fox 可获得轻提示。角色只出现在界面中，不添加到书法作品。
+
 独立实现的浏览器书法排版工具。没有使用参考项目的代码、图片、字库或诗词数据集，也不调用其 API。
 
 ## 运行
@@ -45,6 +47,9 @@ npm run dev
 - `dist/seal.js`：独立印面布局、光学适配及印泥压力/磨损渲染。
 - `dist/font-coverage.js`：TTF/OTF Unicode 字表读取；内置字表与原字体通过测试核对。
 - `dist/body-fonts.js`：内置手写字体的按需加载、状态、错误重试和字表检查。
+- `dist/studio-ui.js`：纸签导航、键盘交互及 Fox 的轻反馈。
+- `dist/fox-studio.css`：Fox 书房的品牌视觉及响应式样式。
+- `dist/assets/fox-brush.png`：依据用户吉祥物制作的透明背景执笔姿态；生成提示词及设计记录见 `docs/mascot-design.md`。
 - `dist/app.js`：表单、草稿、字体导入、翻页和导出。
 - `server.mjs`：仅用于开发的本机静态服务器。
 

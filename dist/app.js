@@ -5,6 +5,7 @@ import { drawSeal } from './seal.js';
 import { fontCoverage } from './font-coverage.js';
 import { sealCoverage } from './fonts/seal-coverage.js';
 import { BODY_FONTS, bodyFontState, loadBodyFont } from './body-fonts.js';
+import { initStudioUI, foxSays } from './studio-ui.js';
 
 const $ = id => document.getElementById(id);
 const samples = {
@@ -169,12 +170,13 @@ document.querySelectorAll('[data-sample]').forEach(button => button.addEventList
   $('lineMode').value = settings.composition === 'album' || button.dataset.sample === 'lanting' ? 'flow' : 'lines';
   pageIndex = 0; update();
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
+  foxSays(`《${sample.title}》，这一页慢慢写。`);
 }));
 $('composition').addEventListener('change', () => {
   $('rows').value = $('composition').value === 'album' ? 'auto' : '16';
   $('lineMode').value = 'flow'; pageIndex = 0; update();
 });
-$('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
+$('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); foxSays('墨已蘸好，这一纸也换了新气息。'); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
 $('previousPage').addEventListener('click', () => { if (pageIndex > 0) { pageIndex--; renderCurrentPage(); } });
 $('nextPage').addEventListener('click', () => { if (pageIndex < layout.pages.length - 1) { pageIndex++; renderCurrentPage(); } });
 
@@ -241,7 +243,8 @@ $('download').addEventListener('click', () => withExport(async () => {
   link.href = url; link.download = `${safeFilename(settings.title)}_第${pageIndex + 1}页.png`;
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30000);
-  toast('高清图片已生成，请查看浏览器下载记录。');
+  toast('高清图片已生成，去下载里收好这一页。');
+  foxSays('这页写得用心，记得好好收着。');
 }));
 
 $('print').addEventListener('click', () => withExport(async () => {
@@ -262,7 +265,7 @@ $('print').addEventListener('click', () => withExport(async () => {
   } finally { $('print').textContent = '整篇存 PDF ↗'; }
 }));
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
-restoreDraft(); update();
+initStudioUI(); restoreDraft(); update();
 document.fonts.ready.then(renderCurrentPage);
 const builtinSeal = new FontFace('CNSSeal', `url("${new URL('./fonts/CNS-ShuoWen.ttf', import.meta.url).href}")`);
 builtinSeal.load().then(face => { document.fonts.add(face); sealReady = true; }).catch(() => { sealReady = false; }).finally(() => { sealLoading = false; update(); });
