@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="自在小楷：在浏览器里写一页自己的书法。自定义文字、宣纸竖排、长文分页与高清导出。">
+  <meta name="theme-color" content="#f5f3ed">
+  <title>自在小楷 · 一方纸墨，自在书写</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="自在小楷首页"><span class="brand-seal" aria-hidden="true">自<br>在</span><span>自在小楷<small>一方纸墨，自在书写</small></span></a>
+    <div class="header-note"><span class="status-dot"></span>文字留在本机<span class="desktop-note"> · 无需登录</span></div>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">THE QUIET ART OF WRITING</p><h1>写一页，<em>慢一点。</em></h1><p class="intro-copy">把喜欢的文字，安放在一纸小楷里。</p></div>
+      <div class="intro-aside"><span>字有章法，心有闲处。</span><small>选一段文字 · 调一纸墨色 · 收一页清欢</small></div>
+    </section>
+    <div class="studio">
+      <aside class="editor" aria-label="作品编辑">
+        <section class="editor-section">
+          <div class="section-heading"><h2><span>01</span> 写下文字</h2><span id="saveStatus" class="quiet">草稿自动保存</span></div>
+          <div class="samples" aria-label="诗文示例"><button type="button" data-sample="shanju">山居秋暝</button><button type="button" data-sample="chibi">赤壁</button><button type="button" data-sample="lanting">兰亭集序 · 节选</button></div>
+          <div class="field-pair"><label>题名<input id="title" maxlength="14" value="山居秋暝" placeholder="无题"></label><label>作者<input id="author" maxlength="20" value="唐 · 王维" placeholder="作者或书写者"></label></div>
+          <label class="body-label" for="body">正文<span id="charCount">40 字</span></label>
+          <textarea id="body" rows="7" maxlength="16000" spellcheck="false" placeholder="在这里写下诗词、书信，或自己的心情……">空山新雨后，天气晚来秋。
+明月松间照，清泉石上流。
+竹喧归浣女，莲动下渔舟。
+随意春芳歇，王孙自可留。</textarea>
+          <div class="body-footer"><span>连续竖排 · 长文自动分页</span><label class="checkbox"><input id="punctuation" type="checkbox">保留标点</label></div>
+        </section>
+        <section class="editor-section">
+          <div class="section-heading"><h2><span>02</span> 选纸与字</h2></div>
+          <fieldset><legend>纸面章法</legend><div class="paper-options"><label class="paper-option"><input type="radio" name="style" value="clean" checked><span class="paper-swatch clean"><i>永</i></span><span>素笺<small>留白见意</small></span></label><label class="paper-option"><input type="radio" name="style" value="ruled"><span class="paper-swatch ruled"><i>永</i></span><span>乌丝栏<small>落笔有度</small></span></label></div></fieldset>
+          <div class="field-pair"><label>书写字体<select id="font"><option value="kai">系统楷体</option><option value="song">系统宋体</option><option value="fang">系统仿宋</option></select></label><label>宣纸色调<select id="paper"><option value="warm">暖米宣</option><option value="white">月白宣</option></select></label></div>
+          <button class="font-upload" id="fontImport" type="button"><span>＋ 导入自己的字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+          <p class="font-help" id="fontHelp">使用设备已安装的字体；导入字体仅在本次会话有效，请确认使用权。</p>
+          <div class="field-pair"><label>列数<select id="columns"><option value="8">8 列 · 疏朗</option><option value="10" selected>10 列 · 均衡</option><option value="12">12 列 · 紧凑</option></select></label><label>每列字数<select id="rows"><option value="12">12 字</option><option value="14">14 字</option><option value="16" selected>16 字</option><option value="20">20 字</option></select></label></div>
+          <label class="checkbox natural"><input type="checkbox" id="natural" checked>自然墨色<span>轻微浓淡与错落</span></label>
+        </section>
+        <section class="editor-section last-section">
+          <div class="section-heading"><h2><span>03</span> 落款钤印</h2></div>
+          <div class="field-pair colophon-pair"><label>篇尾落款<input id="colophon" maxlength="20" placeholder="留空使用作者"></label><label>印文<input id="seal" maxlength="4" value="自在" placeholder="留空不钤印"></label></div>
+          <p class="font-help">题名最多 14 字，落款最多 20 字，印文最多 4 字。</p>
+        </section>
+      </aside>
+      <section class="workspace" aria-label="书法作品预览">
+        <div class="workspace-toolbar"><div><span class="preview-dot"></span> 册页预览 <span class="quiet live-label">实时排版</span></div><button id="newInk" class="text-button" type="button"><span aria-hidden="true">↻</span> 换一纸墨色</button></div>
+        <div class="paper-stage"><div class="paper-mat"><canvas id="artwork" width="1600" height="2000" role="img" aria-label="山居秋暝书法预览"></canvas><div id="emptyState" class="empty-state" hidden><span>一纸待书</span><p>在左侧写下文字，作品即刻呈现。</p></div></div></div>
+        <div class="preview-footer"><span id="pageInfo">正文 40 字 · 每页可容 128 字</span><nav class="pagination" aria-label="作品翻页"><button id="previousPage" type="button" aria-label="上一页">←</button><span id="pageNumber" aria-live="polite">01 / 01</span><button id="nextPage" type="button" aria-label="下一页">→</button></nav></div>
+        <div class="export-bar"><div><h2>把这一页，留给自己。</h2><p>高清 PNG · 2400 × 3000 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇存 PDF <span aria-hidden="true">↗</span></button><button id="download" class="primary-button" type="button">下载当前页 <span aria-hidden="true">↓</span></button></div></div>
+        <p class="print-help">PDF 将打开系统打印窗口，选择「另存为 PDF」。建议关闭页眉页脚。</p>
+      </section>
+    </div>
+    <footer class="site-footer"><span>自在小楷 <span class="footer-divider">/</span> 以字寄意，以纸藏心。</span><span>独立实现 · 本地排版 · 无水印</span></footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="printRoot" aria-hidden="true"></div>
+</body>
+</html>
