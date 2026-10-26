@@ -68,7 +68,7 @@ export function signaturePosition(page, settings, isLastPage) {
     const titleEnd = top + rh * 2.6 + titleLength * titleStep;
     const end = bottom - (sealChars.length ? sealSize + 72 : 48);
     const start = Math.max(titleEnd + rh * .65, end - Math.max(0, noteChars.length - 1) * rh * .65);
-    const step = Math.min(rh * .65, (end - start) / Math.max(1, noteChars.length - 1));
+    const step = noteChars.length <= 1 ? rh * .65 : Math.min(rh * .65, (end - start) / (noteChars.length - 1));
     return { x: right - cw / 2, y: start, noteChars, noteSize: Math.min(size * .69, Math.max(10, step * .9)), step, sealChars, sealSize, sealY: bottom - sealSize / 2 - 24 };
   }
   const used = page.columns.filter(c => c.length);

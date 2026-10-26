@@ -1,6 +1,7 @@
 import { random, characters, signaturePosition, pageGeometry, verticalCenters } from './layout.js';
 import { paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
+import { mountGeometry, paintMount } from './mounting.js';
 
 export const FONT_FAMILIES = {
   mashan: 'ShufaMaShanZheng, KaiTi, STKaiti, serif',
@@ -40,7 +41,7 @@ function stamp(ctx, signature, settings) {
   ctx.restore();
 }
 
-export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1600) {
+export function drawArtwork(canvas, page, settings, pageIndex, pageCount, width = 1600) {
   canvas.width = width;
   const geometry = pageGeometry(settings);
   canvas.height = Math.round(width * geometry.height / 1600);
@@ -107,5 +108,17 @@ export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1
     ctx.fillStyle = 'rgba(100,80,55,.45)';
     ctx.fillText(`${pageIndex + 1} / ${pageCount}`, 800, geometry.height - 70);
   }
+  return canvas;
+}
+
+export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1600) {
+  const g = mountGeometry(settings);
+  if (g.mount === 'none') return drawArtwork(canvas, page, settings, pageIndex, pageCount, width);
+  canvas.width = width; canvas.height = Math.round(width * g.height / g.width);
+  const ctx = canvas.getContext('2d'); ctx.scale(width / g.width, width / g.width);
+  paintMount(ctx, g, settings.seed + pageIndex * 271);
+  const art = document.createElement('canvas');
+  drawArtwork(art, page, settings, pageIndex, pageCount, Math.round(width * g.paperWidth / g.width));
+  ctx.drawImage(art, g.x, g.y, g.paperWidth, g.paperHeight);
   return canvas;
 }

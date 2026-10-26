@@ -1,4 +1,4 @@
-import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows, pageGeometry } from './layout.js';
+import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows } from './layout.js';
 import { drawPage } from './renderer.js';
 import { PAPERS, paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
@@ -6,6 +6,7 @@ import { fontCoverage } from './font-coverage.js';
 import { sealCoverage } from './fonts/seal-coverage.js';
 import { BODY_FONTS, bodyFontState, loadBodyFont } from './body-fonts.js';
 import { initStudioUI, foxSays } from './studio-ui.js';
+import { MOUNTS, mountGeometry } from './mounting.js';
 
 const $ = id => document.getElementById(id);
 const samples = {
@@ -13,7 +14,7 @@ const samples = {
   chibi: { title: '赤壁', author: '唐 · 杜牧', body: '折戟沉沙铁未销，自将磨洗认前朝。\n东风不与周郎便，铜雀春深锁二乔。' },
   lanting: { title: '兰亭集序', author: '晋 · 王羲之', body: '永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。群贤毕至，少长咸集。此地有崇山峻岭，茂林修竹，又有清流激湍，映带左右，引以为流觞曲水，列坐其次。虽无丝竹管弦之盛，一觞一咏，亦足以畅叙幽情。\n是日也，天朗气清，惠风和畅。仰观宇宙之大，俯察品类之盛，所以游目骋怀，足以极视听之娱，信可乐也。\n夫人之相与，俯仰一世。或取诸怀抱，悟言一室之内；或因寄所托，放浪形骸之外。虽趣舍万殊，静躁不同，当其欣于所遇，暂得于己，快然自足，不知老之将至。及其所之既倦，情随事迁，感慨系之矣。' }
 };
-const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle', 'sealFont', 'sealTexture'];
+const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle', 'sealFont', 'sealTexture', 'mount', 'scene'];
 let seed = 915, pageIndex = 0, layout, settings, timer, toastTimer;
 let loadedFont = null, fontRequest = 0, busy = false;
 let sealReady = false, sealLoading = true, customSealFont = null, customSealCoverage = null, sealFontRequest = 0;
@@ -84,6 +85,7 @@ function renderCurrentPage() {
 function update() {
   clearTimeout(timer);
   settings = readSettings();
+  document.querySelector('.paper-stage').dataset.scene = settings.scene;
   const bodyMeta = BODY_FONTS[settings.font], bodyState = bodyFontState(settings.font);
   settings.bodyRenderFont = settings.font;
   $('bodyFontRetry').hidden = !(bodyMeta && bodyState.status === 'error');
@@ -124,9 +126,12 @@ function update() {
   if (sealChars.length) drawSeal(proof, sealChars, settings);
   else proof.getContext('2d').clearRect(0, 0, proof.width, proof.height);
   proof.setAttribute('aria-label', `印章「${sealChars.join('')}」放大预览`);
-  const geometry = pageGeometry(settings);
-  canvas.style.aspectRatio = `1600 / ${geometry.height}`;
-  $('exportDimensions').textContent = `高清 PNG · 2400 × ${Math.round(geometry.height * 1.5)} 像素`;
+  const geometry = mountGeometry(settings);
+  canvas.parentElement.dataset.mounted = String(geometry.mount !== 'none');
+  canvas.style.aspectRatio = `${geometry.width} / ${geometry.height}`;
+  $('exportDimensions').textContent = `高清 PNG · 2400 × ${Math.round(2400 * geometry.height / geometry.width)} 像素${geometry.mount === 'none' ? '' : ' · 含装裱'}`;
+  document.querySelectorAll('[data-mount]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mount === settings.mount)));
+  $('mountDescription').textContent = (MOUNTS[settings.mount] || MOUNTS.none).description;
   const genre = verseRows(settings.body).genre;
   $('layoutDescription').textContent = `${$('rows').value === 'auto' ? genre + ' · 自动' : '自定'} ${settings.columns} 列 × ${settings.rows} 字；${settings.composition === 'album' ? '右列题名、落款与钤印' : '落款跟随正文末列'}。`;
   document.querySelectorAll('[data-paper]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.paper === settings.paper)));
@@ -158,6 +163,9 @@ $('bodyFontRetry').addEventListener('click', () => {
   update();
 });
 document.querySelectorAll('input[name="style"]').forEach(el => el.addEventListener('change', update));
+document.querySelectorAll('[data-mount]').forEach(button => button.addEventListener('click', () => {
+  $('mount').value = button.dataset.mount; update(); foxSays(`替这一页配上${MOUNTS[button.dataset.mount].name}，喜欢就收好。`);
+}));
 document.querySelectorAll('[data-paper]').forEach(button => {
   const swatch = button.querySelector('canvas');
   const context = swatch.getContext('2d'); context.scale(swatch.width / 1600, swatch.height / 2000);
@@ -226,7 +234,7 @@ async function withExport(action) {
   update();
   if (!layout?.pages.length || busy) return;
   busy = true; syncButtons();
-  const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk')];
+  const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk, #scene')];
   controls.forEach(control => { control.disabled = true; });
   try { await loadBodyFont(settings.font); await document.fonts.ready; await action(); }
   catch (error) { toast(`导出失败：${error.message || '请稍后重试'}`, true); }
