@@ -4,6 +4,7 @@ import { PAPERS, paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
 import { fontCoverage } from './font-coverage.js';
 import { sealCoverage } from './fonts/seal-coverage.js';
+import { BODY_FONTS, bodyFontState, loadBodyFont } from './body-fonts.js';
 
 const $ = id => document.getElementById(id);
 const samples = {
@@ -61,8 +62,9 @@ function saveDraft() {
 function syncButtons() {
   const empty = !layout?.pages.length;
   const awaitingFont = !!settings?.seal.trim() && settings.sealFont === 'seal' && sealLoading;
-  $('download').disabled = empty || busy || awaitingFont;
-  $('print').disabled = empty || busy || awaitingFont;
+  const awaitingBody = BODY_FONTS[settings?.font] && bodyFontState(settings.font).status !== 'ready';
+  $('download').disabled = empty || busy || awaitingFont || awaitingBody;
+  $('print').disabled = empty || busy || awaitingFont || awaitingBody;
   $('previousPage').disabled = empty || pageIndex === 0 || busy;
   $('nextPage').disabled = empty || pageIndex >= layout.pages.length - 1 || busy;
 }
@@ -81,6 +83,27 @@ function renderCurrentPage() {
 function update() {
   clearTimeout(timer);
   settings = readSettings();
+  const bodyMeta = BODY_FONTS[settings.font], bodyState = bodyFontState(settings.font);
+  settings.bodyRenderFont = settings.font;
+  $('bodyFontRetry').hidden = !(bodyMeta && bodyState.status === 'error');
+  $('bodyFontStatus').classList.remove('font-warning');
+  if (bodyMeta) {
+    if (bodyState.status === 'idle') {
+      const selected = settings.font;
+      loadBodyFont(selected).then(() => { if ($('font').value === selected) update(); }).catch(() => { if ($('font').value === selected) update(); });
+    }
+    const current = bodyFontState(settings.font);
+    if (current.status === 'ready') {
+      const missing = [...new Set(characters(`${settings.title}${settings.author}${settings.colophon}${settings.body}`))].filter(c => current.coverage && !current.coverage.has(c.codePointAt(0)));
+      $('bodyFontStatus').textContent = `${bodyMeta.description} 已加载。${missing.length ? `「${missing.slice(0, 6).join('、')}」等 ${missing.length} 字不在字库中，将使用系统后备字体。` : ''}`;
+      $('bodyFontStatus').classList.toggle('font-warning', missing.length > 0);
+    } else {
+      settings.bodyRenderFont = 'kai';
+      $('bodyFontStatus').textContent = current.status === 'error' ? '字体加载失败，预览暂用楷体。请重新加载或切换字体后导出。' : `正在加载${bodyMeta.name}，预览暂用楷体；就绪后即可导出。`;
+      $('bodyFontStatus').classList.toggle('font-warning', current.status === 'error');
+    }
+  } else $('bodyFontStatus').textContent = settings.font === 'custom' ? '当前使用本次导入字体，刷新后需重新导入。' : '系统字体随设备而异；内置手写字体可跨设备使用。';
+  document.querySelectorAll('[data-body-font]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.bodyFont === settings.font)));
   const sealChars = characters(settings.seal, true).slice(0, 4);
   const coverage = settings.sealFont === 'seal' ? sealCoverage : settings.sealFont === 'custom' ? customSealCoverage : null;
   const missing = coverage ? sealChars.filter(char => !coverage.has(char.codePointAt(0))) : [];
@@ -127,6 +150,12 @@ function update() {
 }
 
 fields.forEach(id => $(id).addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 130); }));
+document.querySelectorAll('[data-body-font]').forEach(button => button.addEventListener('click', () => { $('font').value = button.dataset.bodyFont; update(); }));
+$('bodyFontRetry').addEventListener('click', () => {
+  const selected = $('font').value;
+  loadBodyFont(selected, true).then(() => { if ($('font').value === selected) update(); }).catch(() => { if ($('font').value === selected) update(); });
+  update();
+});
 document.querySelectorAll('input[name="style"]').forEach(el => el.addEventListener('change', update));
 document.querySelectorAll('[data-paper]').forEach(button => {
   const swatch = button.querySelector('canvas');
@@ -197,7 +226,7 @@ async function withExport(action) {
   busy = true; syncButtons();
   const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk')];
   controls.forEach(control => { control.disabled = true; });
-  try { await document.fonts.ready; await action(); }
+  try { await loadBodyFont(settings.font); await document.fonts.ready; await action(); }
   catch (error) { toast(`导出失败：${error.message || '请稍后重试'}`, true); }
   finally { controls.forEach(control => { control.disabled = false; }); busy = false; syncButtons(); }
 }

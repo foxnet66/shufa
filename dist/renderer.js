@@ -3,6 +3,8 @@ import { paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
 
 export const FONT_FAMILIES = {
+  mashan: 'ShufaMaShanZheng, KaiTi, STKaiti, serif',
+  longcang: 'ShufaLongCang, KaiTi, STKaiti, serif',
   kai: 'KaiTi, STKaiti, "Kaiti SC", "楷体", serif',
   song: 'SimSun, "Songti SC", "Noto Serif CJK SC", serif',
   fang: 'FangSong, STFangsong, "仿宋", serif',
@@ -51,7 +53,7 @@ export function drawPage(canvas, page, settings, pageIndex, pageCount, width = 1
   const { left, right, top, bottom, album } = geometry;
   const cw = (right - left) / settings.columns;
   const rh = (bottom - top) / settings.rows;
-  const font = FONT_FAMILIES[settings.font] || FONT_FAMILIES.kai;
+  const font = FONT_FAMILIES[settings.bodyRenderFont || settings.font] || FONT_FAMILIES.kai;
   const size = Math.min(cw * (album ? .68 : .74), rh * (album ? .8 : .78));
   if (settings.style === 'ruled') {
     ctx.strokeStyle = cool ? 'rgba(100,110,99,.29)' : 'rgba(135,104,76,.28)';
