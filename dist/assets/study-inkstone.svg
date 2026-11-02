@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 105">
+  <defs>
+    <linearGradient id="stone" x1="0" y1="0" x2=".6" y2="1"><stop stop-color="#626358"/><stop offset=".6" stop-color="#454b41"/><stop offset="1" stop-color="#363e36"/></linearGradient>
+    <radialGradient id="ink"><stop stop-color="#3e473c"/><stop offset="1" stop-color="#202c25"/></radialGradient>
+  </defs>
+  <ellipse cx="91" cy="91" rx="81" ry="8" fill="#4d4325" opacity=".09"/>
+  <g transform="translate(161 4) rotate(-4)">
+    <rect x="0" y="0" width="24" height="72" rx="2" fill="#333a32" stroke="#232c25"/>
+    <path d="M3 4v63m3-63h14" stroke="#737363" stroke-width=".8" opacity=".6"/>
+    <rect x="7" y="8" width="12" height="43" rx="1" fill="none" stroke="#b39b63" stroke-opacity=".55" stroke-width=".7"/>
+    <text x="13" y="22" text-anchor="middle" fill="#b9a46e" font-size="10" font-family="SimSun,serif">松<tspan x="13" dy="15">烟</tspan></text>
+  </g>
+  <path d="M15 42C27 33 136 30 156 39C174 46 183 74 174 84C159 99 29 99 13 87C4 79 4 51 15 42Z" fill="#30392f"/>
+  <path d="M15 39C32 30 133 28 155 37C171 43 180 68 171 77C153 90 31 92 14 80C6 73 5 48 15 39Z" fill="url(#stone)" stroke="#858271" stroke-width=".8"/>
+  <path d="M24 43C48 37 129 35 146 42C158 48 165 65 158 70C141 79 43 82 24 72C16 68 15 48 24 43Z" fill="none" stroke="#929180" stroke-opacity=".42" stroke-width="1"/>
+  <path d="M31 48C52 42 126 42 139 47C149 51 154 62 146 66C128 74 51 74 32 68C25 65 23 52 31 48Z" fill="url(#ink)"/>
+  <path d="M42 50c20-4 62-4 78-2" fill="none" stroke="#b4b8a1" stroke-opacity=".18" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M20 81c32 8 110 9 144-2" fill="none" stroke="#858472" stroke-opacity=".25"/>
+</svg>
