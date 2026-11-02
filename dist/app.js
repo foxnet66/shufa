@@ -7,13 +7,10 @@ import { sealCoverage } from './fonts/seal-coverage.js';
 import { BODY_FONTS, bodyFontState, loadBodyFont } from './body-fonts.js';
 import { initStudioUI } from './studio-ui.js';
 import { MOUNTS, mountGeometry } from './mounting.js';
+import { CLASSICS_BY_ID as samples } from './classics.js';
+import { initClassicsLibrary } from './classics-ui.js';
 
 const $ = id => document.getElementById(id);
-const samples = {
-  shanju: { title: '山居秋暝', author: '唐 · 王维', body: '空山新雨后，天气晚来秋。\n明月松间照，清泉石上流。\n竹喧归浣女，莲动下渔舟。\n随意春芳歇，王孙自可留。' },
-  chibi: { title: '赤壁', author: '唐 · 杜牧', body: '折戟沉沙铁未销，自将磨洗认前朝。\n东风不与周郎便，铜雀春深锁二乔。' },
-  lanting: { title: '兰亭集序', author: '晋 · 王羲之', body: '永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。群贤毕至，少长咸集。此地有崇山峻岭，茂林修竹，又有清流激湍，映带左右，引以为流觞曲水，列坐其次。虽无丝竹管弦之盛，一觞一咏，亦足以畅叙幽情。\n是日也，天朗气清，惠风和畅。仰观宇宙之大，俯察品类之盛，所以游目骋怀，足以极视听之娱，信可乐也。\n夫人之相与，俯仰一世。或取诸怀抱，悟言一室之内；或因寄所托，放浪形骸之外。虽趣舍万殊，静躁不同，当其欣于所遇，暂得于己，快然自足，不知老之将至。及其所之既倦，情随事迁，感慨系之矣。' }
-};
 const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle', 'sealFont', 'sealTexture', 'mount', 'scene'];
 let seed = 915, pageIndex = 0, layout, settings, timer, toastTimer;
 let loadedFont = null, fontRequest = 0, busy = false;
@@ -172,13 +169,25 @@ document.querySelectorAll('[data-paper]').forEach(button => {
   paintPaper(context, button.dataset.paper, 915);
   button.addEventListener('click', () => { $('paper').value = button.dataset.paper; update(); });
 });
-document.querySelectorAll('[data-sample]').forEach(button => button.addEventListener('click', () => {
-  const sample = samples[button.dataset.sample];
+let beforeClassicLoad = null;
+function loadClassic(id) {
+  const sample = samples[id];
+  if (!sample || busy) return false;
+  beforeClassicLoad = { title: $('title').value, author: $('author').value, body: $('body').value, lineMode: $('lineMode').value, pageIndex };
+  $('classicUndo').hidden = false;
   for (const field of ['title', 'author', 'body']) $(field).value = sample[field];
-  $('lineMode').value = settings.composition === 'album' || button.dataset.sample === 'lanting' ? 'flow' : 'lines';
+  $('lineMode').value = settings.composition === 'album' || sample.category === '古文' ? 'flow' : 'lines';
   pageIndex = 0; update();
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
-}));
+  return true;
+}
+document.querySelectorAll('[data-sample]').forEach(button => button.addEventListener('click', () => loadClassic(button.dataset.sample)));
+$('classicUndo').addEventListener('click', () => {
+  if (!beforeClassicLoad || busy) return;
+  for (const field of ['title', 'author', 'body', 'lineMode']) $(field).value = beforeClassicLoad[field];
+  pageIndex = beforeClassicLoad.pageIndex; beforeClassicLoad = null; $('classicUndo').hidden = true;
+  update(); toast('已恢复载入前文字。');
+});
 $('heroSample').addEventListener('click', () => {
   if (busy) return;
   document.querySelector('[data-sample="shanju"]').click();
@@ -240,10 +249,11 @@ async function withExport(action) {
   if (!layout?.pages.length || busy) return;
   busy = true; syncButtons();
   const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk, #scene, #heroSample')];
+  const disabledBeforeExport = controls.map(control => control.disabled);
   controls.forEach(control => { control.disabled = true; });
   try { await loadBodyFont(settings.font); await document.fonts.ready; await action(); }
   catch (error) { toast(`导出失败：${error.message || '请稍后重试'}`, true); }
-  finally { controls.forEach(control => { control.disabled = false; }); busy = false; syncButtons(); }
+  finally { controls.forEach((control, index) => { control.disabled = disabledBeforeExport[index]; }); busy = false; syncButtons(); }
 }
 
 $('download').addEventListener('click', () => withExport(async () => {
@@ -277,7 +287,7 @@ $('print').addEventListener('click', () => withExport(async () => {
   } finally { $('print').textContent = '整篇 PDF'; }
 }));
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
-initStudioUI(); restoreDraft(); update();
+initStudioUI(); restoreDraft(); initClassicsLibrary(loadClassic); update();
 document.fonts.ready.then(renderCurrentPage);
 const builtinSeal = new FontFace('CNSSeal', `url("${new URL('./fonts/CNS-ShuoWen.ttf', import.meta.url).href}")`);
 builtinSeal.load().then(face => { document.fonts.add(face); sealReady = true; }).catch(() => { sealReady = false; }).finally(() => { sealLoading = false; update(); });
