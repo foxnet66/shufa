@@ -27,7 +27,7 @@ test('invalid or oversized input is rejected instead of truncated', () => {
 });
 test('export filenames cannot introduce paths', () => {
   assert.equal(safeFilename('../春江:夜?'), '..春江夜');
-  assert.equal(safeFilename(' /:*? '), '自在小楷');
+  assert.equal(safeFilename(' /:*? '), '书法作品');
 });
 
 test('verse lines retain column breaks, wrap long lines, and preserve every character', () => {

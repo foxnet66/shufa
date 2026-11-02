@@ -5,7 +5,7 @@ import { drawSeal } from './seal.js';
 import { fontCoverage } from './font-coverage.js';
 import { sealCoverage } from './fonts/seal-coverage.js';
 import { BODY_FONTS, bodyFontState, loadBodyFont } from './body-fonts.js';
-import { initStudioUI, foxSays } from './studio-ui.js';
+import { initStudioUI, showStudioNote } from './studio-ui.js';
 import { MOUNTS, mountGeometry } from './mounting.js';
 
 const $ = id => document.getElementById(id);
@@ -164,7 +164,7 @@ $('bodyFontRetry').addEventListener('click', () => {
 });
 document.querySelectorAll('input[name="style"]').forEach(el => el.addEventListener('change', update));
 document.querySelectorAll('[data-mount]').forEach(button => button.addEventListener('click', () => {
-  $('mount').value = button.dataset.mount; update(); foxSays(`替这一页配上${MOUNTS[button.dataset.mount].name}，喜欢就收好。`);
+  $('mount').value = button.dataset.mount; update(); showStudioNote(`替这一页配上${MOUNTS[button.dataset.mount].name}，喜欢就收好。`);
 }));
 document.querySelectorAll('[data-paper]').forEach(button => {
   const swatch = button.querySelector('canvas');
@@ -178,13 +178,13 @@ document.querySelectorAll('[data-sample]').forEach(button => button.addEventList
   $('lineMode').value = settings.composition === 'album' || button.dataset.sample === 'lanting' ? 'flow' : 'lines';
   pageIndex = 0; update();
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
-  foxSays(`《${sample.title}》，这一页慢慢写。`);
+  showStudioNote(`《${sample.title}》，这一页慢慢写。`);
 }));
 $('composition').addEventListener('change', () => {
   $('rows').value = $('composition').value === 'album' ? 'auto' : '16';
   $('lineMode').value = 'flow'; pageIndex = 0; update();
 });
-$('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); foxSays('墨已蘸好，这一纸也换了新气息。'); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
+$('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); showStudioNote('墨已蘸好，这一纸也换了新气息。'); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
 $('previousPage').addEventListener('click', () => { if (pageIndex > 0) { pageIndex--; renderCurrentPage(); } });
 $('nextPage').addEventListener('click', () => { if (pageIndex < layout.pages.length - 1) { pageIndex++; renderCurrentPage(); } });
 
@@ -252,7 +252,7 @@ $('download').addEventListener('click', () => withExport(async () => {
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30000);
   toast('高清图片已生成，去下载里收好这一页。');
-  foxSays('这页写得用心，记得好好收着。');
+  showStudioNote('这页写得用心，记得好好收着。');
 }));
 
 $('print').addEventListener('click', () => withExport(async () => {

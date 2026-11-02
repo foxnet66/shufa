@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="欢迎来到 Fox 的纸墨小铺。挑张好纸，写一页喜欢的字，把自己的心事好好收藏。">
+  <meta name="description" content="免费的开源书法排版工具。选择字体、宣纸与装裱，生成竖排诗文，下载高清作品。">
   <meta name="theme-color" content="#f6eddd">
-  <title>自在小楷 · Fox 的纸墨小铺</title>
+  <title>书法排版工具</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
-  <link rel="stylesheet" href="./fox-studio.css">
+  <link rel="stylesheet" href="./studio.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="自在小楷首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>自在小楷<small>Fox 的纸墨小铺</small></span></a>
-    <nav class="header-links" aria-label="书房导航"><a href="#desk">去书桌写字 <span aria-hidden="true">↘</span></a><span class="header-note"><span class="status-dot"></span>Fox 看店中</span></nav>
+    <a class="brand" href="./" aria-label="书法排版工具首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>书法排版<small>开源 · 本机创作</small></span></a>
+    <nav class="header-links" aria-label="书房导航"><a href="#desk">去书桌写字 <span aria-hidden="true">↘</span></a><span class="header-note"><span class="status-dot"></span>文字仅存本机</span></nav>
   </header>
   <main>
     <section class="intro">
-      <div class="hero-copy"><p class="eyebrow"><span aria-hidden="true">✦</span> 一间有狐狸作伴的小书房</p><h1>Fox 备好纸，<br><em>你只管落笔。</em><svg class="headline-swish" viewBox="0 0 330 18" aria-hidden="true"><path d="M4 12 Q148 0 325 9 M15 17 Q164 8 294 14"/></svg></h1><p class="intro-copy">一首诗，一封信，或一句没说出口的话。<br>让喜欢的字，有一张值得留下的纸。</p><a class="hero-link" href="#desk">坐下来，写一页 <span aria-hidden="true">↓</span></a></div>
-      <div class="mascot-hero"><div class="fox-sun" aria-hidden="true"></div><div class="fox-note" id="foxNote" role="status">我负责备纸，你负责喜欢。</div><button type="button" id="foxGreeting" class="fox-greeting" aria-label="和 Fox 打招呼"><img src="./assets/fox-brush.png" width="1254" height="1254" alt="Fox 坐在蓬松尾巴旁，笑着举起毛笔迎接你" fetchpriority="high"></button><span class="fox-name-tag">掌柜 <strong>Fox</strong><span aria-hidden="true"> · </span>今日有空</span><span class="little-star star-one" aria-hidden="true">✧</span><span class="little-star star-two" aria-hidden="true">✦</span></div>
+      <div class="hero-copy"><p class="eyebrow"><span aria-hidden="true">✦</span> 纸 · 墨 · 章法</p><h1>选一纸清雅，<br><em>写一页心意。</em><svg class="headline-swish" viewBox="0 0 330 18" aria-hidden="true"><path d="M4 12 Q148 0 325 9 M15 17 Q164 8 294 14"/></svg></h1><p class="intro-copy">一首诗，一封信，或一句没说出口的话。<br>让喜欢的字，有一张值得留下的纸。</p><a class="hero-link" href="#desk">坐下来，写一页 <span aria-hidden="true">↓</span></a></div>
+
     </section>
-    <div class="desk-heading" id="desk"><div><span class="desk-number">案头 · 〇一</span><h2>把心事，写成好字。</h2></div><p><span class="mini-paw" aria-hidden="true">✦</span> 文字留在你本机，Fox 替你守着。</p></div>
+    <div class="desk-heading" id="desk"><div><span class="desk-number">案头 · 〇一</span><h2>把心事，写成好字。</h2></div><p><span class="mini-paw" aria-hidden="true">✦</span> 文字与草稿仅保存在当前浏览器。</p></div>
     <div class="studio">
       <aside class="editor" aria-label="作品编辑">
         <div class="notebook-binding" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -67,7 +67,7 @@
           <p class="font-help font-attribution">篆书来源：数位发展部 · <a href="https://www.cns11643.gov.tw/" target="_blank" rel="noopener">CNS11643 全字库</a>。<a href="./fonts/NOTICE.txt" target="_blank" rel="noopener">来源与授权</a></p>
           <p class="font-help">题名最多 14 字，落款最多 20 字，印文最多 4 字。</p>
         </section>
-        <div class="fox-margin-note"><span aria-hidden="true">✧</span><p id="deskNote">别急，一笔一画都有自己的节奏。</p><span class="note-signature">— Fox</span></div>
+        <div class="studio-margin-note"><span aria-hidden="true">✧</span><p id="deskNote">别急，一笔一画都有自己的节奏。</p></div>
       </aside>
       <section class="workspace" aria-label="书法作品预览">
         <div class="workspace-toolbar"><div><span class="preview-dot"></span> 你的这一页 <span class="quiet live-label">落笔即成稿</span></div><button id="newInk" class="text-button" type="button"><span aria-hidden="true">↻</span> 重新蘸墨</button></div>
@@ -78,7 +78,7 @@
         <p class="print-help">PDF 将打开系统打印窗口，选择「另存为 PDF」。建议关闭页眉页脚。</p>
       </section>
     </div>
-    <footer class="site-footer"><span class="footer-brand">自在小楷 <span class="footer-divider">/</span> Fox 的纸墨小铺</span><span>字慢慢写，日子慢慢过。<span class="footer-paw" aria-hidden="true">✦</span></span></footer>
+    <footer class="site-footer"><span class="footer-brand">书法排版工具 <span class="footer-divider">/</span> 开源共创</span><span>字慢慢写，日子慢慢过。<span class="footer-paw" aria-hidden="true">✦</span></span></footer>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
   <div id="printRoot" aria-hidden="true"></div>

@@ -4,3 +4,4 @@ node_modules/
 .openai/*.tar.gz
 artifacts/
 outputs/
+.openai/hosting.json

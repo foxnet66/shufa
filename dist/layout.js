@@ -88,5 +88,5 @@ export function random(seed) {
 }
 
 export function safeFilename(title) {
-  return (title || '自在小楷').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').trim().slice(0, 60) || '自在小楷';
+  return (title || '书法作品').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').trim().slice(0, 60) || '书法作品';
 }
