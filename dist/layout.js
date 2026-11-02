@@ -1,4 +1,5 @@
 export const MAX_CHARACTERS = 4000;
+export const MAX_TITLE_CHARACTERS = 120;
 const segmenter = new Intl.Segmenter('zh', { granularity: 'grapheme' });
 
 export function characters(text, keepPunctuation = false) {
@@ -16,6 +17,14 @@ export function verseRows(text) {
 export function pageGeometry(settings) {
   const album = settings.composition === 'album';
   return { width: 1600, height: album ? 1760 : 2000, left: 126, right: 1474, top: album ? 116 : 180, bottom: album ? 1600 : 1770, album };
+}
+
+export function titleColumn(settings) {
+  const { top, bottom, album } = pageGeometry(settings), rh = (bottom - top) / settings.rows;
+  const chars = characters(settings.title || '無題', true).slice(0, MAX_TITLE_CHARACTERS);
+  const step = album ? Math.min(rh * .84, (bottom - top) * .43 / Math.max(1, chars.length)) : Math.min(rh, (bottom - top - rh * 2.5) / Math.max(1, chars.length - 1));
+  const y = top + rh * (album ? 2.6 : 1.5);
+  return { chars, step, y, end: y + chars.length * step, lastY: y + (chars.length - 1) * step };
 }
 
 export function verticalCenters(heights, step, top) {
@@ -63,9 +72,7 @@ export function signaturePosition(page, settings, isLastPage) {
   const sealChars = isLastPage ? characters(settings.seal || '', true).slice(0, 4) : [];
   const sealSize = Math.min(87, cw * .7);
   if (album) {
-    const titleLength = Math.min(14, characters(settings.title || '無題', true).length);
-    const titleStep = Math.min(rh * .84, (bottom - top) * .43 / Math.max(1, titleLength));
-    const titleEnd = top + rh * 2.6 + titleLength * titleStep;
+    const titleEnd = titleColumn(settings).end;
     const end = bottom - (sealChars.length ? sealSize + 72 : 48);
     const start = Math.max(titleEnd + rh * .65, end - Math.max(0, noteChars.length - 1) * rh * .65);
     const step = noteChars.length <= 1 ? rh * .65 : Math.min(rh * .65, (end - start) / (noteChars.length - 1));

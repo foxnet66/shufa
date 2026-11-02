@@ -82,6 +82,7 @@ function renderCurrentPage() {
 function update() {
   clearTimeout(timer);
   settings = readSettings();
+  $('titleLengthNote').hidden = characters(settings.title, true).length <= 14;
   document.querySelector('.paper-stage').dataset.scene = settings.scene;
   const bodyMeta = BODY_FONTS[settings.font], bodyState = bodyFontState(settings.font);
   settings.bodyRenderFont = settings.font;
@@ -176,7 +177,7 @@ function loadClassic(id) {
   beforeClassicLoad = { title: $('title').value, author: $('author').value, body: $('body').value, lineMode: $('lineMode').value, pageIndex };
   $('classicUndo').hidden = false;
   for (const field of ['title', 'author', 'body']) $(field).value = sample[field];
-  $('lineMode').value = settings.composition === 'album' || sample.category === '古文' ? 'flow' : 'lines';
+  $('lineMode').value = settings.composition === 'album' || ['古文', '古体', '四言'].includes(sample.category) ? 'flow' : 'lines';
   pageIndex = 0; update();
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
   return true;

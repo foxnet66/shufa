@@ -1,4 +1,4 @@
-import { random, characters, signaturePosition, pageGeometry, verticalCenters } from './layout.js';
+import { random, characters, signaturePosition, pageGeometry, verticalCenters, titleColumn, MAX_TITLE_CHARACTERS } from './layout.js';
 import { paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
 import { mountGeometry, paintMount } from './mounting.js';
@@ -72,10 +72,8 @@ export function drawArtwork(canvas, page, settings, pageIndex, pageCount, width 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const titleSize = Math.min(size * .86, 76);
-  const title = settings.title || '無題';
-  const titleLength = characters(title, true).slice(0, 14).length;
-  const titleStep = album ? Math.min(rh * .84, (bottom - top) * .43 / Math.max(1, titleLength)) : Math.min(rh, (bottom - top - rh * 2.5) / Math.max(1, titleLength - 1));
-  vertical(ctx, title, right - cw / 2, top + rh * (album ? 2.6 : 1.5), Math.min(titleSize, titleStep * .85), titleStep, font, '#302b24', 14);
+  const title = titleColumn(settings);
+  vertical(ctx, title.chars.join(''), right - cw / 2, title.y, Math.min(titleSize, title.step * .85), title.step, font, '#302b24', MAX_TITLE_CHARACTERS);
   page.columns.forEach((column, i) => {
     const x = right - (i + 1.5) * cw;
     const phase = rng() * Math.PI * 2;

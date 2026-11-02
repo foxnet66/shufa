@@ -1,0 +1,259 @@
+{
+  "repository": "chinese-poetry/chinese-poetry",
+  "commit": "b8594f81a89752241442f2ce267d6f66f96704ee",
+  "sources": [
+    {
+      "collection": "唐诗选",
+      "path": "全唐诗/唐诗三百首.json",
+      "sha256": "d77a145f7470da2ed2f79515944563c062ffc43fceda07f195a36ead66b7e5c7",
+      "records": 366,
+      "added": 343
+    },
+    {
+      "collection": "宋词选",
+      "path": "宋词/宋词三百首.json",
+      "sha256": "ca5d74f7fdb9d5a6acc22a7c8b4395228cad4bb8be53df44c19ba83ab6983b20",
+      "records": 280,
+      "added": 278
+    },
+    {
+      "collection": "诗经",
+      "path": "诗经/shijing.json",
+      "sha256": "3c7ca54d59424542ada99adfcc85420287fbbd5c8a511e9baf705cb2b04051e7",
+      "records": 305,
+      "added": 305
+    },
+    {
+      "collection": "论语",
+      "path": "论语/lunyu.json",
+      "sha256": "bc336a3839706377892719db44c48a09794a493190535a42bf1c7d4c4233e96c",
+      "records": 20,
+      "added": 20
+    }
+  ],
+  "skipped": [
+    {
+      "collection": "唐诗选",
+      "index": 72,
+      "title": "赤壁",
+      "author": "杜牧",
+      "retainedId": "chibi",
+      "reason": "existing-selected-edition"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 120,
+      "title": "春晓",
+      "author": "孟浩然",
+      "retainedId": "chunxiao",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 124,
+      "title": "春宫怨",
+      "author": "杜荀鹤",
+      "retainedId": "tang-dc18d1470c081b9d",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 133,
+      "title": "山居秋暝",
+      "author": "王维",
+      "retainedId": "shanju",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 142,
+      "title": "辋川集 鹿柴",
+      "author": "王维",
+      "retainedId": "luzhai",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 143,
+      "title": "辋川集 竹里馆",
+      "author": "王维",
+      "retainedId": "zhuliguan",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 147,
+      "title": "九月九日忆山东兄弟",
+      "author": "王维",
+      "retainedId": "jiuyuejiuri",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 168,
+      "title": "出塞二首 一",
+      "author": "王昌龄",
+      "retainedId": "tang-8716bc309d86c803",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 203,
+      "title": "江雪",
+      "author": "柳宗元",
+      "retainedId": "jiangxue",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 207,
+      "title": "春望",
+      "author": "杜甫",
+      "retainedId": "chunwang",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 257,
+      "title": "杂曲歌辞 清平调 一",
+      "author": "李白",
+      "retainedId": "tang-806f5449588935b5",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 258,
+      "title": "杂曲歌辞 清平调 二",
+      "author": "李白",
+      "retainedId": "tang-ae0de4b57fd8f194",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 279,
+      "title": "枫桥夜泊",
+      "author": "张继",
+      "retainedId": "fengqiaoyebo",
+      "reason": "existing-selected-edition"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 306,
+      "title": "关山月",
+      "author": "李白",
+      "retainedId": "tang-4621e53ec16ae86e",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 308,
+      "title": "清平调词三首 一",
+      "author": "李白",
+      "retainedId": "tang-806f5449588935b5",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 320,
+      "title": "黄鹤楼送孟浩然之广陵",
+      "author": "李白",
+      "retainedId": "songmenghaoran",
+      "reason": "existing-selected-edition"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 326,
+      "title": "早发白帝城",
+      "author": "李白",
+      "retainedId": "zaofabaidicheng",
+      "reason": "existing-selected-edition"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 340,
+      "title": "相和歌辞 子夜四时歌四首 春歌",
+      "author": "李白",
+      "retainedId": "tang-d54fc9b1c9b4926c",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 342,
+      "title": "相和歌辞 子夜四时歌四首 秋歌",
+      "author": "李白",
+      "retainedId": "tang-0a4a14be94779627",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 343,
+      "title": "相和歌辞 子夜四时歌四首 冬歌",
+      "author": "李白",
+      "retainedId": "tang-c8c15a0298965526",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 345,
+      "title": "杂曲歌辞 游子吟",
+      "author": "孟郊",
+      "retainedId": "tang-8166453479651a2c",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 356,
+      "title": "杂曲歌辞 秋夜曲",
+      "author": "王涯",
+      "retainedId": "tang-af92a91f30aa39d9",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "唐诗选",
+      "index": 360,
+      "title": "登鹳雀楼",
+      "author": "王之涣",
+      "retainedId": "dengguanquelou",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "宋词选",
+      "index": 38,
+      "title": "水调歌头",
+      "author": "苏轼",
+      "retainedId": "shuidiaogetou",
+      "reason": "identical-author-and-text"
+    },
+    {
+      "collection": "宋词选",
+      "index": 159,
+      "title": "浣溪沙",
+      "author": "晏殊",
+      "retainedId": "huanxisha",
+      "reason": "identical-author-and-text"
+    }
+  ],
+  "byCollection": {
+    "常用选篇": 24,
+    "唐诗选": 357,
+    "宋词选": 280,
+    "诗经": 305,
+    "论语": 20
+  },
+  "imported": 946,
+  "base": 24,
+  "total": 970,
+  "converter": "opencc-js 1.4.2, t → cn",
+  "variants": {
+    "緜": "绵",
+    "牀": "床",
+    "羣": "群",
+    "峯": "峰",
+    "髙": "高",
+    "畵": "画",
+    "淸": "清",
+    "卽": "即",
+    "眞": "真",
+    "兎": "兔"
+  }
+}

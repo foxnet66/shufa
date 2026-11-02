@@ -4,6 +4,16 @@
   "license": "MIT",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "node server.mjs", "start": "node server.mjs", "test": "node --test tests/*.test.mjs" },
-  "engines": { "node": ">=20" }
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "corpus:build": "node scripts/build-classics.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "opencc-js": "1.4.2"
+  }
 }

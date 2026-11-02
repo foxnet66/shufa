@@ -33,9 +33,9 @@
         <div class="notebook-meta"><span id="saveStatus" class="quiet">草稿自动保存</span></div>
         <section class="editor-section" id="panel-writing" role="tabpanel" aria-labelledby="tab-writing">
           <details class="classics-library">
-            <summary>诗文选<span>二十四篇</span></summary>
-            <div class="classics-filters"><label>检索<input id="classicSearch" type="search" maxlength="80" placeholder="篇名、作者或诗句" autocomplete="off"></label><label>体裁<select id="classicCategory"><option value="">全部</option><option>五言</option><option>七言</option><option>词</option><option>古文</option></select></label></div>
-            <div class="classics-list-heading"><label for="classicList">篇目</label><span id="classicCount" role="status">24 篇</span></div>
+            <summary>诗文选<span id="classicTotal"></span></summary>
+            <div class="classics-filters"><label>检索<input id="classicSearch" type="search" maxlength="80" placeholder="篇名、作者或诗句" autocomplete="off"></label><label>体裁<select id="classicCategory"><option value="">全部</option></select></label><label class="classics-collection">文集<select id="classicCollection"><option value="">全部文集</option></select></label></div>
+            <div class="classics-list-heading"><label for="classicList">篇目</label><span id="classicCount" role="status"></span></div>
             <select id="classicList" size="5" aria-label="篇目"></select>
             <div class="classic-preview" role="region" aria-label="诗文预览"><h3 id="classicPreviewTitle"></h3><p id="classicPreviewMeta"></p><pre id="classicPreviewBody" tabindex="0" aria-label="预览正文"></pre><p id="classicNote"></p></div>
             <div class="classic-actions"><a id="classicSource" target="_blank" rel="noopener">校阅参考</a><button type="button" id="classicLoad">录入此篇</button></div>
@@ -43,7 +43,8 @@
           </details>
           <button type="button" id="classicUndo" class="classic-undo" hidden>恢复载入前文字</button>
           <div class="samples" aria-label="诗文示例"><button type="button" data-sample="shanju">山居秋暝</button><button type="button" data-sample="chibi">赤壁</button><button type="button" data-sample="lanting">兰亭集序 · 节选</button></div>
-          <div class="field-pair"><label>题名<input id="title" maxlength="14" value="山居秋暝" placeholder="无题"></label><label>作者<input id="author" maxlength="20" value="唐 · 王维" placeholder="作者或书写者"></label></div>
+          <div class="field-pair"><label>题名<input id="title" maxlength="120" value="山居秋暝" placeholder="无题"></label><label>作者<input id="author" maxlength="20" value="唐 · 王维" placeholder="作者或书写者"></label></div>
+          <p id="titleLengthNote" class="font-help" hidden>题名较长，题款将缩小显示，可自拟短题。</p>
           <label class="body-label" for="body">正文<span id="charCount">40 字</span></label>
           <textarea id="body" rows="7" maxlength="16000" spellcheck="false" placeholder="录入诗文……">空山新雨后，天气晚来秋。
 明月松间照，清泉石上流。

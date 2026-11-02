@@ -14,10 +14,15 @@
 
 设备字体未随仓库分发。用户自行导入字体的使用权由导入者确认。
 
-诗文选为独立录入的 24 篇古典公版作品，采用通行简体，节选篇目已注明。篇目与校阅入口见 [诗文选记录](docs/classics-sources.md)。没有包含参考项目的代码、字库、图片或数据集。纸张、墨色、印泥与装裱纹理由本项目代码绘制。
+诗文库共 970 篇：首批 24 篇独立录入，新增 946 篇整理自 chinese-poetry/chinese-poetry 固定版本。没有使用原参考书法站的数据集。篇目、变换、去重与版本说明见 [诗文选记录](docs/classics-sources.md)。
 
 本版本不包含维护者的私有品牌素材。AI 辅助参与代码制作，不表示第三方权利已经得到自动清除。
 
 首页 `dist/assets/study-stilllife.png` 为内置 imagegen 生成的文房静物图，非实拍照片；参考网页仅用于研究材质与构图，没有将其图片复制或嵌入本站。生成过程与完整提示词见 [制作记录](docs/stilllife-image.md)。
 
 授权来源核对日期：2026-11-02。
+
+## 扩充语料与开发工具
+
+- 新增诗文数据：[chinese-poetry/chinese-poetry](https://github.com/chinese-poetry/chinese-poetry)，MIT，Copyright (c) 2016 JackeyGao。随静态语料附带 [完整上游许可](dist/data/chinese-poetry-LICENSE.txt)，固定版本与文件校验值见 [导入清单](docs/classics-import.json)。
+- 繁简转换开发工具：opencc-js 1.4.2（MIT AND Apache-2.0）。仅在重建语料时运行，不将其代码或转换词典打包到浏览器。许可参考：[MIT](licenses/opencc-js-MIT.txt)、[词典 Apache-2.0](licenses/opencc-data-Apache-2.0.txt)。
