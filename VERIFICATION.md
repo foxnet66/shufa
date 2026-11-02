@@ -2,6 +2,9 @@
 
 ## 无品牌开源版本（2026-11-02）
 
+- 以 imagegen 写实静物替换早期 SVG 文房装饰与 CSS 纸片。PNG 为 1448 × 1086、RGBA（保留透明度），本地资产约 1.94 MB。
+- Chrome 确认图片成功加载、透明边缘融入页面；390px 视口内容宽 376px，按钮点击仍载入《山居秋暝》，错误日志为空。截图 artifacts/photographic-study-desktop.png。
+
 - 首页增加自绘 SVG 竹笔、松烟墨锭与砚台，与诗笺组成文房静物；装饰不可交互且对辅助技术隐藏，样张按钮仍可载入诗文。
 - 浏览器确认两张 SVG 加载成功，390px 视口内容宽 376px，无横向溢出，样张点击正常、错误日志为空；截图 artifacts/four-treasures-desktop.png。
 
