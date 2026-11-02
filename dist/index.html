@@ -14,16 +14,16 @@
 <body>
   <header class="site-header">
     <a class="brand" href="./" aria-label="书法排版工具首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>书法排版</span></a>
-    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头 <span aria-hidden="true">↘</span></a></nav>
+    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头</a></nav>
   </header>
   <main>
     <section class="intro" aria-label="书法创作介绍">
-      <div class="hero-copy"><h1>展卷，<em>落墨。</em></h1><a class="hero-link" href="#desk">开始书写 <span aria-hidden="true">↓</span></a></div>
+      <div class="hero-copy"><h1>展卷，<em>落墨。</em></h1><a class="hero-link" href="#desk">开始书写</a></div>
       <div class="hero-specimen hero-stilllife-scene">
         <button type="button" id="heroSample" class="hero-stilllife" aria-label="载入《山居秋暝》示例">
           <img src="./assets/study-stilllife.png" width="1448" height="1086" alt="" fetchpriority="high" decoding="async">
         </button>
-        <span class="specimen-caption">试写一篇 ↗</span>
+        <span class="specimen-caption">试写一篇</span>
       </div>
     </section>
     <div class="desk-heading" id="desk"><div><h2>案头</h2></div></div>
@@ -50,7 +50,7 @@
           <div class="handwriting-samples" aria-label="内置手写字体"><button type="button" data-body-font="mashan">马善政 · 端正毛笔</button><button type="button" data-body-font="longcang">龙藏 · 舒展行草</button></div>
           <p id="bodyFontStatus" class="font-help" role="status">系统字体随设备而异；内置手写字体可跨设备使用。</p><button type="button" id="bodyFontRetry" class="text-button" hidden>重新加载字体</button>
           <p class="font-help font-attribution">字体许可 · <a href="./fonts/MaShanZheng-OFL.txt" target="_blank" rel="noopener">马善政 OFL</a> · <a href="./fonts/LongCang-OFL.txt" target="_blank" rel="noopener">龙藏 OFL</a>。</p>
-          <button class="font-upload" id="fontImport" type="button"><span>＋ 导入字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+          <button class="font-upload" id="fontImport" type="button"><span>导入字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
           <p class="font-help" id="fontHelp">导入字体仅本次有效（≤30 MB），请确认使用权。</p>
           <div class="field-pair"><label>列数<select id="columns"><option value="8">8 列 · 疏朗</option><option value="10" selected>10 列 · 均衡</option><option value="12">12 列 · 紧凑</option></select></label><label>每列字数<select id="rows"><option value="auto" selected>随体裁自动</option><option value="12">12 字</option><option value="14">14 字</option><option value="15">15 字</option><option value="16">16 字</option><option value="20">20 字</option></select></label></div>
           <p id="layoutDescription" class="font-help">五言 15 字，七言 14 字；右列题名、落款与钤印。</p>
@@ -62,7 +62,7 @@
           <div class="field-pair colophon-pair"><label>篇尾落款<input id="colophon" maxlength="20" placeholder="留空使用作者"></label><label>印文<input id="seal" maxlength="4" value="自在" placeholder="留空不钤印"></label></div>
           <label class="seal-style-label">印式<select id="sealStyle"><option value="intaglio">白文印 · 朱地白字</option><option value="relief">朱文印 · 细边红字</option></select></label>
           <div class="field-pair seal-style-label"><label>印章字体<select id="sealFont"><option value="seal">全字库说文解字 · 篆书</option><option value="kai">系统楷体</option><option value="song">系统宋体</option></select></label><label>印泥质感<select id="sealTexture"><option value="fresh">新钤 · 温润</option><option value="worn">古印 · 微残</option></select></label></div>
-          <button class="font-upload" id="sealFontImport" type="button"><span>＋ 导入印章字体</span><span>独立于正文</span></button><input type="file" id="sealFontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+          <button class="font-upload" id="sealFontImport" type="button"><span>导入印章字体</span><span>独立于正文</span></button><input type="file" id="sealFontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
           <p id="sealFontStatus" class="font-help" role="status">正在准备篆书字体…</p>
           <div class="seal-proof"><canvas id="sealPreview" width="600" height="600" role="img" aria-label="印章放大预览"></canvas><div><strong>印面预览</strong><p id="sealLayoutHint">双字纵排</p></div></div>
           <p class="font-help font-attribution">篆书来源：数位发展部 · <a href="https://www.cns11643.gov.tw/" target="_blank" rel="noopener">CNS11643 全字库</a>。<a href="./fonts/NOTICE.txt" target="_blank" rel="noopener">来源与授权</a></p>
@@ -70,11 +70,11 @@
         </section>
       </aside>
       <section class="workspace" aria-label="书法作品预览">
-        <div class="workspace-toolbar"><div><span class="preview-dot"></span> 作品</div><button id="newInk" class="text-button" type="button"><span aria-hidden="true">↻</span> 重新蘸墨</button></div>
+        <div class="workspace-toolbar"><div>作品</div><button id="newInk" class="text-button" type="button"> 重新蘸墨</button></div>
         <div class="scene-picker"><label for="scene">背景</label><select id="scene" aria-describedby="sceneHint"><option value="linen">亚麻 · 晨光</option><option value="walnut">胡桃 · 暖暮</option><option value="sage">青灰 · 静室</option></select><span id="sceneHint">不随作品导出</span></div>
         <div class="paper-stage" data-scene="linen"><div class="paper-mat"><canvas id="artwork" width="1600" height="2000" role="img" aria-label="山居秋暝书法预览"></canvas><div id="emptyState" class="empty-state" hidden><span>一纸待书</span><p>录入诗文，即可预览。</p></div></div></div>
-        <div class="preview-footer"><span id="pageInfo">正文 40 字 · 每页可容 128 字</span><nav class="pagination" aria-label="作品翻页"><button id="previousPage" type="button" aria-label="上一页">←</button><span id="pageNumber" aria-live="polite">01 / 01</span><button id="nextPage" type="button" aria-label="下一页">→</button></nav></div>
-        <div class="export-bar"><div><h2>留存</h2><p id="exportDimensions">高清 PNG · 2400 × 2640 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇 PDF <span aria-hidden="true">↗</span></button><button id="download" class="primary-button" type="button" aria-label="下载当前页高清 PNG">存为 PNG <span aria-hidden="true">↓</span></button></div></div>
+        <div class="preview-footer"><span id="pageInfo">正文 40 字 · 每页可容 128 字</span><nav class="pagination" aria-label="作品翻页"><button id="previousPage" type="button" aria-label="前页">前页</button><span id="pageNumber" aria-live="polite">01 / 01</span><button id="nextPage" type="button" aria-label="后页">后页</button></nav></div>
+        <div class="export-bar"><div><h2>留存</h2><p id="exportDimensions">高清 PNG · 2400 × 2640 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇 PDF</button><button id="download" class="primary-button" type="button" aria-label="下载当前页高清 PNG">存为 PNG</button></div></div>
         <p class="print-help">PDF：在打印窗口选择「另存为 PDF」，关闭页眉页脚。</p>
       </section>
     </div>

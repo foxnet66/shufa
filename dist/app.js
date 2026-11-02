@@ -274,7 +274,7 @@ $('print').addEventListener('click', () => withExport(async () => {
     }
     toast('已准备全部册页，请在打印窗口选择「另存为 PDF」。');
     window.print();
-  } finally { $('print').textContent = '整篇 PDF ↗'; }
+  } finally { $('print').textContent = '整篇 PDF'; }
 }));
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
 initStudioUI(); restoreDraft(); update();
