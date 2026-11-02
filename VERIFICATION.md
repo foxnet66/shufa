@@ -2,6 +2,9 @@
 
 ## 无品牌开源版本（2026-11-02）
 
+- 使用内置 imagegen 编辑静物图，减轻粗纸纹理、移除试笔痕迹，在主纸面增加两列书法；人工逐字核对右列「明月松间照」、左列「清泉石上流」。
+- 新 PNG 保持 1448 × 1086 RGBA；首页目视检查墨字可读，浏览器错误日志为空。截图 artifacts/written-study-desktop.png，编辑提示词追加至 docs/stilllife-image.md。
+
 - 以 imagegen 写实静物替换早期 SVG 文房装饰与 CSS 纸片。PNG 为 1448 × 1086、RGBA（保留透明度），本地资产约 1.94 MB。
 - Chrome 确认图片成功加载、透明边缘融入页面；390px 视口内容宽 376px，按钮点击仍载入《山居秋暝》，错误日志为空。截图 artifacts/photographic-study-desktop.png。
 
