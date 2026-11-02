@@ -1,22 +1,13 @@
-const notes = {
-  writing: '别急，一笔一画都有自己的节奏。',
-  paper: '纸有自己的脾气，挑一张顺眼的。',
-  seal: '留一点呼吸，再盖上属于你的印。'
-};
-
-export function showStudioNote(message) {
-  document.getElementById('deskNote').textContent = message;
-}
+const panels = ['writing', 'paper', 'seal'];
 
 export function setEditorTab(name, focus = false) {
-  if (!Object.hasOwn(notes, name)) return;
+  if (!panels.includes(name)) return;
   document.querySelectorAll('[data-editor-tab]').forEach(button => {
     const active = button.dataset.editorTab === name;
     button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
     document.getElementById(`panel-${button.dataset.editorTab}`).hidden = !active;
     if (active && focus) button.focus();
   });
-  document.getElementById('deskNote').textContent = notes[name];
 }
 
 export function initStudioUI() {

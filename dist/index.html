@@ -13,78 +13,73 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="书法排版工具首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>书法排版<small>开源 · 本机创作</small></span></a>
-    <nav class="header-links" aria-label="书房导航"><a href="#desk">去书桌写字 <span aria-hidden="true">↘</span></a><span class="header-note"><span class="status-dot"></span>文字仅存本机</span></nav>
+    <a class="brand" href="./" aria-label="书法排版工具首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>书法排版</span></a>
+    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头 <span aria-hidden="true">↘</span></a></nav>
   </header>
   <main>
     <section class="intro" aria-label="书法创作介绍">
-      <div class="hero-copy"><p class="eyebrow"><span aria-hidden="true">✦</span> 纸 · 墨 · 章法</p><h1>选一纸清雅，<br><em>写一页心意。</em><svg class="headline-swish" viewBox="0 0 330 18" aria-hidden="true"><path d="M4 12 Q148 0 325 9 M15 17 Q164 8 294 14"/></svg></h1><p class="intro-copy">一首诗，一封信，或一句没说出口的话。<br>让喜欢的字，有一张值得留下的纸。</p><a class="hero-link" href="#desk">坐下来，写一页 <span aria-hidden="true">↓</span></a></div>
+      <div class="hero-copy"><h1>展卷，<em>落墨。</em></h1><a class="hero-link" href="#desk">开始书写 <span aria-hidden="true">↓</span></a></div>
       <div class="hero-specimen">
-        <span class="specimen-index">章法一览 <span aria-hidden="true">／</span> 〇一</span>
+
         <button type="button" id="heroSample" class="specimen-sheet" aria-label="载入《山居秋暝》示例">
           <span class="specimen-inner" aria-hidden="true"><span class="specimen-title">山居秋暝<span>唐 · 王维</span></span><span class="specimen-verses"><span>明月松间照</span><span>清泉石上流</span></span><span class="specimen-seal">山<br>居</span></span>
         </button>
-        <span class="specimen-caption">一纸素笺，半卷清欢。<span>点选样张，试写此篇 ↗</span></span>
+        <span class="specimen-caption">试写此篇 ↗</span>
       </div>
     </section>
-    <div class="desk-heading" id="desk"><div><span class="desk-number">案头 · 〇一</span><h2>把心事，写成好字。</h2></div><p><span class="mini-paw" aria-hidden="true">✦</span> 文字与草稿仅保存在当前浏览器。</p></div>
+    <div class="desk-heading" id="desk"><div><h2>案头</h2></div></div>
     <div class="studio">
       <aside class="editor" aria-label="作品编辑">
-        <div class="notebook-binding" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="editor-tabs" role="tablist" aria-label="创作步骤"><button type="button" id="tab-writing" role="tab" aria-controls="panel-writing" aria-selected="true" data-editor-tab="writing"><span>壹</span> 写字</button><button type="button" id="tab-paper" role="tab" aria-controls="panel-paper" aria-selected="false" tabindex="-1" data-editor-tab="paper"><span>贰</span> 选纸</button><button type="button" id="tab-seal" role="tab" aria-controls="panel-seal" aria-selected="false" tabindex="-1" data-editor-tab="seal"><span>叁</span> 钤印</button></div>
-        <div class="notebook-meta"><span>我的稿纸</span><span id="saveStatus" class="quiet">草稿自动保存</span></div>
+        <div class="editor-tabs" role="tablist" aria-label="创作步骤"><button type="button" id="tab-writing" role="tab" aria-controls="panel-writing" aria-selected="true" data-editor-tab="writing"><span>壹</span> 录文</button><button type="button" id="tab-paper" role="tab" aria-controls="panel-paper" aria-selected="false" tabindex="-1" data-editor-tab="paper"><span>贰</span> 选纸</button><button type="button" id="tab-seal" role="tab" aria-controls="panel-seal" aria-selected="false" tabindex="-1" data-editor-tab="seal"><span>叁</span> 钤印</button></div>
+        <div class="notebook-meta"><span id="saveStatus" class="quiet">草稿自动保存</span></div>
         <section class="editor-section" id="panel-writing" role="tabpanel" aria-labelledby="tab-writing">
-          <div class="section-heading"><h2>今天，想写点什么？</h2><span class="pencil-mark" aria-hidden="true">↙</span></div>
           <div class="samples" aria-label="诗文示例"><button type="button" data-sample="shanju">山居秋暝</button><button type="button" data-sample="chibi">赤壁</button><button type="button" data-sample="lanting">兰亭集序 · 节选</button></div>
           <div class="field-pair"><label>题名<input id="title" maxlength="14" value="山居秋暝" placeholder="无题"></label><label>作者<input id="author" maxlength="20" value="唐 · 王维" placeholder="作者或书写者"></label></div>
           <label class="body-label" for="body">正文<span id="charCount">40 字</span></label>
-          <textarea id="body" rows="7" maxlength="16000" spellcheck="false" placeholder="在这里写下诗词、书信，或自己的心情……">空山新雨后，天气晚来秋。
+          <textarea id="body" rows="7" maxlength="16000" spellcheck="false" placeholder="录入诗文……">空山新雨后，天气晚来秋。
 明月松间照，清泉石上流。
 竹喧归浣女，莲动下渔舟。
 随意春芳歇，王孙自可留。</textarea>
-          <div class="body-footer"><span id="flowHint">连续竖排 · 长文自动分页</span><label class="checkbox"><input id="punctuation" type="checkbox">保留标点</label></div>
+          <div class="body-footer"><span id="flowHint">连续竖排</span><label class="checkbox"><input id="punctuation" type="checkbox">保留标点</label></div>
         </section>
         <section class="editor-section" id="panel-paper" role="tabpanel" aria-labelledby="tab-paper" hidden>
-          <div class="section-heading"><h2>好字，也要配张好纸。</h2></div>
           <label class="composition-preset">册页范式<select id="composition"><option value="album">诗文册页 · 右列题款</option><option value="free">舒朗长笺 · 随文落款</option></select></label>
-          <fieldset><legend>纸面章法</legend><div class="paper-options"><label class="paper-option"><input type="radio" name="style" value="clean"><span class="paper-swatch clean"><i>永</i></span><span>素笺<small>留白见意</small></span></label><label class="paper-option"><input type="radio" name="style" value="ruled" checked><span class="paper-swatch ruled"><i>永</i></span><span>乌丝栏<small>落笔有度</small></span></label></div></fieldset>
-          <fieldset class="paper-materials"><legend>选一纸质地</legend><input type="hidden" id="paper" value="warm"><div class="material-options"><button type="button" data-paper="warm" aria-pressed="true"><canvas width="90" height="110" aria-hidden="true"></canvas><span>暖米生宣</span><small>温润 · 细纤维</small></button><button type="button" data-paper="white" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>月白熟宣</span><small>清洁 · 细密纹</small></button><button type="button" data-paper="aged" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>淡茶旧笺</span><small>浅茶 · 微旧化</small></button></div><p class="font-help" id="paperDescription">温润米白，细长纤维；宜清润小楷。</p></fieldset>
-          <fieldset class="mount-options"><legend>替这一页，选个装裱</legend><input type="hidden" id="mount" value="none"><div class="mount-choices"><button type="button" data-mount="none" aria-pressed="true"><span class="mount-swatch mount-none" aria-hidden="true"><i></i></span><span>纯宣纸</span></button><button type="button" data-mount="mat" aria-pressed="false"><span class="mount-swatch mount-mat" aria-hidden="true"><i></i></span><span>留白卡纸</span></button><button type="button" data-mount="silk" aria-pressed="false"><span class="mount-swatch mount-silk" aria-hidden="true"><i></i></span><span>宋锦册页</span></button><button type="button" data-mount="wood" aria-pressed="false"><span class="mount-swatch mount-wood" aria-hidden="true"><i></i></span><span>胡桃木框</span></button></div><p id="mountDescription" class="font-help">保留纯纸画心，便于自行装裱。</p><p class="font-help mount-export-note">装裱会一并保存到 PNG 与整篇 PDF。材质为数字模拟。</p></fieldset>
+          <fieldset><legend>纸面章法</legend><div class="paper-options"><label class="paper-option"><input type="radio" name="style" value="clean"><span class="paper-swatch clean"><i>永</i></span><span>素笺</span></label><label class="paper-option"><input type="radio" name="style" value="ruled" checked><span class="paper-swatch ruled"><i>永</i></span><span>乌丝栏</span></label></div></fieldset>
+          <fieldset class="paper-materials"><legend>纸质</legend><input type="hidden" id="paper" value="warm"><div class="material-options"><button type="button" data-paper="warm" aria-pressed="true"><canvas width="90" height="110" aria-hidden="true"></canvas><span>暖米生宣</span><small>温润 · 细纤维</small></button><button type="button" data-paper="white" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>月白熟宣</span><small>清洁 · 细密纹</small></button><button type="button" data-paper="aged" aria-pressed="false"><canvas width="90" height="110" aria-hidden="true"></canvas><span>淡茶旧笺</span><small>浅茶 · 微旧化</small></button></div><p class="font-help" id="paperDescription">温润米白，细长纤维；宜清润小楷。</p></fieldset>
+          <fieldset class="mount-options"><legend>装裱</legend><input type="hidden" id="mount" value="none"><div class="mount-choices"><button type="button" data-mount="none" aria-pressed="true"><span class="mount-swatch mount-none" aria-hidden="true"><i></i></span><span>纯宣纸</span></button><button type="button" data-mount="mat" aria-pressed="false"><span class="mount-swatch mount-mat" aria-hidden="true"><i></i></span><span>留白卡纸</span></button><button type="button" data-mount="silk" aria-pressed="false"><span class="mount-swatch mount-silk" aria-hidden="true"><i></i></span><span>宋锦册页</span></button><button type="button" data-mount="wood" aria-pressed="false"><span class="mount-swatch mount-wood" aria-hidden="true"><i></i></span><span>胡桃木框</span></button></div><p id="mountDescription" class="font-help">保留纯纸画心，便于自行装裱。</p><p class="font-help mount-export-note">装裱随作品导出。</p></fieldset>
           <label>书写字体<select id="font"><optgroup label="内置手写字体"><option value="mashan">马善政楷书 · 毛笔</option><option value="longcang">龙藏手写体 · 行草</option></optgroup><optgroup label="设备字体"><option value="kai" selected>系统楷体</option><option value="song">系统宋体</option><option value="fang">系统仿宋</option></optgroup></select></label>
           <div class="handwriting-samples" aria-label="内置手写字体"><button type="button" data-body-font="mashan">马善政 · 端正毛笔</button><button type="button" data-body-font="longcang">龙藏 · 舒展行草</button></div>
           <p id="bodyFontStatus" class="font-help" role="status">系统字体随设备而异；内置手写字体可跨设备使用。</p><button type="button" id="bodyFontRetry" class="text-button" hidden>重新加载字体</button>
-          <p class="font-help font-attribution">内置手写字体来自 Google Fonts，按 OFL 1.1 随站点提供：<a href="./fonts/MaShanZheng-OFL.txt" target="_blank" rel="noopener">马善政授权</a> · <a href="./fonts/LongCang-OFL.txt" target="_blank" rel="noopener">龙藏授权</a>。</p>
-          <button class="font-upload" id="fontImport" type="button"><span>＋ 导入自己的字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
-          <p class="font-help" id="fontHelp">使用设备已安装的字体；导入字体仅在本次会话有效，请确认使用权。</p>
+          <p class="font-help font-attribution">字体许可 · <a href="./fonts/MaShanZheng-OFL.txt" target="_blank" rel="noopener">马善政 OFL</a> · <a href="./fonts/LongCang-OFL.txt" target="_blank" rel="noopener">龙藏 OFL</a>。</p>
+          <button class="font-upload" id="fontImport" type="button"><span>＋ 导入字体</span><span>TTF / OTF / WOFF</span></button><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+          <p class="font-help" id="fontHelp">导入字体仅本次有效（≤30 MB），请确认使用权。</p>
           <div class="field-pair"><label>列数<select id="columns"><option value="8">8 列 · 疏朗</option><option value="10" selected>10 列 · 均衡</option><option value="12">12 列 · 紧凑</option></select></label><label>每列字数<select id="rows"><option value="auto" selected>随体裁自动</option><option value="12">12 字</option><option value="14">14 字</option><option value="15">15 字</option><option value="16">16 字</option><option value="20">20 字</option></select></label></div>
           <p id="layoutDescription" class="font-help">五言 15 字，七言 14 字；右列题名、落款与钤印。</p>
           <div class="field-pair composition-options"><label>行文方式<select id="lineMode"><option value="flow">连续竖排</option><option value="lines">按原文换行分列</option></select></label><label>墨色<select id="ink"><option value="balanced">清润</option><option value="dense">浓墨</option><option value="light">淡墨</option></select></label></div>
-          <p class="font-help composition-help">诗词可按原文换列；过长的一行会自动接列，空行不占列。纸张为数字质感模拟。</p>
-          <label class="checkbox natural"><input type="checkbox" id="natural" checked>自然墨色<span>轻微浓淡与错落</span></label>
+          <details class="editor-help"><summary>排版说明</summary><p>长行自动接列，空行不占列。纸张与装裱均为数字模拟。</p></details>
+          <label class="checkbox natural"><input type="checkbox" id="natural" checked>自然墨色</label>
         </section>
         <section class="editor-section last-section" id="panel-seal" role="tabpanel" aria-labelledby="tab-seal" hidden>
-          <div class="section-heading"><h2>最后，盖一个自己的印。</h2></div>
           <div class="field-pair colophon-pair"><label>篇尾落款<input id="colophon" maxlength="20" placeholder="留空使用作者"></label><label>印文<input id="seal" maxlength="4" value="自在" placeholder="留空不钤印"></label></div>
           <label class="seal-style-label">印式<select id="sealStyle"><option value="intaglio">白文印 · 朱地白字</option><option value="relief">朱文印 · 细边红字</option></select></label>
           <div class="field-pair seal-style-label"><label>印章字体<select id="sealFont"><option value="seal">全字库说文解字 · 篆书</option><option value="kai">系统楷体</option><option value="song">系统宋体</option></select></label><label>印泥质感<select id="sealTexture"><option value="fresh">新钤 · 温润</option><option value="worn">古印 · 微残</option></select></label></div>
           <button class="font-upload" id="sealFontImport" type="button"><span>＋ 导入印章字体</span><span>独立于正文</span></button><input type="file" id="sealFontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
           <p id="sealFontStatus" class="font-help" role="status">正在准备篆书字体…</p>
-          <div class="seal-proof"><canvas id="sealPreview" width="600" height="600" role="img" aria-label="印章放大预览"></canvas><div><strong>印面预览</strong><p id="sealLayoutHint">双字纵排</p><small>印章字体独立设置<br>留空印文可不钤印</small></div></div>
+          <div class="seal-proof"><canvas id="sealPreview" width="600" height="600" role="img" aria-label="印章放大预览"></canvas><div><strong>印面预览</strong><p id="sealLayoutHint">双字纵排</p></div></div>
           <p class="font-help font-attribution">篆书来源：数位发展部 · <a href="https://www.cns11643.gov.tw/" target="_blank" rel="noopener">CNS11643 全字库</a>。<a href="./fonts/NOTICE.txt" target="_blank" rel="noopener">来源与授权</a></p>
-          <p class="font-help">题名最多 14 字，落款最多 20 字，印文最多 4 字。</p>
+
         </section>
-        <div class="studio-margin-note"><span aria-hidden="true">✧</span><p id="deskNote">别急，一笔一画都有自己的节奏。</p></div>
       </aside>
       <section class="workspace" aria-label="书法作品预览">
-        <div class="workspace-toolbar"><div><span class="preview-dot"></span> 你的这一页 <span class="quiet live-label">落笔即成稿</span></div><button id="newInk" class="text-button" type="button"><span aria-hidden="true">↻</span> 重新蘸墨</button></div>
-        <div class="scene-picker"><label for="scene">案头光景</label><select id="scene" aria-describedby="sceneHint"><option value="linen">亚麻 · 晨光</option><option value="walnut">胡桃 · 暖暮</option><option value="sage">青灰 · 静室</option></select><span id="sceneHint">仅作陈列，不入画心</span></div>
-        <div class="paper-stage" data-scene="linen"><div class="paper-mat"><canvas id="artwork" width="1600" height="2000" role="img" aria-label="山居秋暝书法预览"></canvas><div id="emptyState" class="empty-state" hidden><span>一纸待书</span><p>在左侧写下文字，作品即刻呈现。</p></div></div></div>
+        <div class="workspace-toolbar"><div><span class="preview-dot"></span> 作品</div><button id="newInk" class="text-button" type="button"><span aria-hidden="true">↻</span> 重新蘸墨</button></div>
+        <div class="scene-picker"><label for="scene">背景</label><select id="scene" aria-describedby="sceneHint"><option value="linen">亚麻 · 晨光</option><option value="walnut">胡桃 · 暖暮</option><option value="sage">青灰 · 静室</option></select><span id="sceneHint">不随作品导出</span></div>
+        <div class="paper-stage" data-scene="linen"><div class="paper-mat"><canvas id="artwork" width="1600" height="2000" role="img" aria-label="山居秋暝书法预览"></canvas><div id="emptyState" class="empty-state" hidden><span>一纸待书</span><p>录入诗文，即可预览。</p></div></div></div>
         <div class="preview-footer"><span id="pageInfo">正文 40 字 · 每页可容 128 字</span><nav class="pagination" aria-label="作品翻页"><button id="previousPage" type="button" aria-label="上一页">←</button><span id="pageNumber" aria-live="polite">01 / 01</span><button id="nextPage" type="button" aria-label="下一页">→</button></nav></div>
-        <div class="export-bar"><div><h2>喜欢，就收好。</h2><p id="exportDimensions">高清 PNG · 2400 × 2640 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇存 PDF <span aria-hidden="true">↗</span></button><button id="download" class="primary-button" type="button" aria-label="下载当前页高清 PNG">收下这一页 <span aria-hidden="true">↓</span></button></div></div>
-        <p class="print-help">PDF 将打开系统打印窗口，选择「另存为 PDF」。建议关闭页眉页脚。</p>
+        <div class="export-bar"><div><h2>留存</h2><p id="exportDimensions">高清 PNG · 2400 × 2640 像素</p></div><div class="export-actions"><button id="print" class="secondary-button" type="button">整篇 PDF <span aria-hidden="true">↗</span></button><button id="download" class="primary-button" type="button" aria-label="下载当前页高清 PNG">存为 PNG <span aria-hidden="true">↓</span></button></div></div>
+        <p class="print-help">PDF：在打印窗口选择「另存为 PDF」，关闭页眉页脚。</p>
       </section>
     </div>
-    <footer class="site-footer"><span class="footer-brand">书法排版工具 <span class="footer-divider">/</span> 开源共创</span><span>字慢慢写，日子慢慢过。<span class="footer-paw" aria-hidden="true">✦</span></span></footer>
+    <footer class="site-footer"><span>文字与草稿仅存本机</span><a href="https://github.com/foxnet66/shufa/blob/main/LICENSE" target="_blank" rel="noopener">MIT 开源</a></footer>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
   <div id="printRoot" aria-hidden="true"></div>

@@ -5,7 +5,7 @@ import { drawSeal } from './seal.js';
 import { fontCoverage } from './font-coverage.js';
 import { sealCoverage } from './fonts/seal-coverage.js';
 import { BODY_FONTS, bodyFontState, loadBodyFont } from './body-fonts.js';
-import { initStudioUI, showStudioNote } from './studio-ui.js';
+import { initStudioUI } from './studio-ui.js';
 import { MOUNTS, mountGeometry } from './mounting.js';
 
 const $ = id => document.getElementById(id);
@@ -50,14 +50,14 @@ function restoreDraft() {
       $('composition').value = 'album'; $('rows').value = 'auto'; $('lineMode').value = 'flow';
     }
     if (Number.isSafeInteger(saved.seed)) seed = saved.seed;
-    $('saveStatus').textContent = '已恢复本机草稿';
+    $('saveStatus').textContent = '草稿已恢复';
   } catch { $('saveStatus').textContent = '本机草稿不可用'; }
 }
 
 function saveDraft() {
   try {
     localStorage.setItem('zizai-shufa-v1', JSON.stringify({ ...settings, rows: $('rows').value, font: settings.font === 'custom' ? 'kai' : settings.font, sealFont: settings.sealFont === 'custom' ? 'kai' : settings.sealFont }));
-    $('saveStatus').textContent = '已保存至本机';
+    $('saveStatus').textContent = '草稿已存';
   } catch { $('saveStatus').textContent = '草稿未保存'; }
 }
 
@@ -77,8 +77,8 @@ function renderCurrentPage() {
   if (!empty) drawPage(canvas, layout.pages[pageIndex], settings, pageIndex, layout.pages.length);
   $('pageNumber').textContent = `${String(empty ? 0 : pageIndex + 1).padStart(2, '0')} / ${String(layout?.pages.length || 0).padStart(2, '0')}`;
   canvas.setAttribute('aria-label', `${settings.title || '无题'}，第 ${empty ? 0 : pageIndex + 1} 页，共 ${layout?.pages.length || 0} 页书法预览`);
-  $('pageInfo').textContent = `正文 ${layout?.count || 0} 字 · 每页可容 ${layout?.capacity || 0} 字`;
-  if (layout?.pages.length && settings.lineMode === 'lines') $('pageInfo').textContent = `正文 ${layout.count} 字 · 本页 ${layout.pages[pageIndex].columns.length} 列`;
+  $('pageInfo').textContent = `${layout?.count || 0} 字`;
+  if (layout?.pages.length && settings.lineMode === 'lines') $('pageInfo').textContent = `${layout.count} 字 · 本页 ${layout.pages[pageIndex].columns.length} 列`;
   syncButtons();
 }
 
@@ -98,14 +98,14 @@ function update() {
     const current = bodyFontState(settings.font);
     if (current.status === 'ready') {
       const missing = [...new Set(characters(`${settings.title}${settings.author}${settings.colophon}${settings.body}`))].filter(c => current.coverage && !current.coverage.has(c.codePointAt(0)));
-      $('bodyFontStatus').textContent = `${bodyMeta.description} 已加载。${missing.length ? `「${missing.slice(0, 6).join('、')}」等 ${missing.length} 字不在字库中，将使用系统后备字体。` : ''}`;
+      $('bodyFontStatus').textContent = `${bodyMeta.name} · 已就绪。${missing.length ? `「${missing.slice(0, 6).join('、')}」等 ${missing.length} 字不在字库中，将使用系统后备字体。` : ''}`;
       $('bodyFontStatus').classList.toggle('font-warning', missing.length > 0);
     } else {
       settings.bodyRenderFont = 'kai';
       $('bodyFontStatus').textContent = current.status === 'error' ? '字体加载失败，预览暂用楷体。请重新加载或切换字体后导出。' : `正在加载${bodyMeta.name}，预览暂用楷体；就绪后即可导出。`;
       $('bodyFontStatus').classList.toggle('font-warning', current.status === 'error');
     }
-  } else $('bodyFontStatus').textContent = settings.font === 'custom' ? '当前使用本次导入字体，刷新后需重新导入。' : '系统字体随设备而异；内置手写字体可跨设备使用。';
+  } else $('bodyFontStatus').textContent = settings.font === 'custom' ? '当前使用本次导入字体，刷新后需重新导入。' : '设备字体随系统而异。';
   document.querySelectorAll('[data-body-font]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.bodyFont === settings.font)));
   const sealChars = characters(settings.seal, true).slice(0, 4);
   const coverage = settings.sealFont === 'seal' ? sealCoverage : settings.sealFont === 'custom' ? customSealCoverage : null;
@@ -140,7 +140,7 @@ function update() {
     const sample = samples[button.dataset.sample];
     button.setAttribute('aria-pressed', String(['title', 'author', 'body'].every(key => settings[key] === sample[key])));
   });
-  $('flowHint').textContent = settings.lineMode === 'lines' ? '依原文换列 · 长行自动接列' : '连续竖排 · 长文自动分页';
+  $('flowHint').textContent = settings.lineMode === 'lines' ? '依原文换列' : '连续竖排';
   const count = characters(settings.body, settings.keepPunctuation).length;
   $('charCount').textContent = `${count} / ${MAX_CHARACTERS} 字`;
   try {
@@ -164,7 +164,7 @@ $('bodyFontRetry').addEventListener('click', () => {
 });
 document.querySelectorAll('input[name="style"]').forEach(el => el.addEventListener('change', update));
 document.querySelectorAll('[data-mount]').forEach(button => button.addEventListener('click', () => {
-  $('mount').value = button.dataset.mount; update(); showStudioNote(`替这一页配上${MOUNTS[button.dataset.mount].name}，喜欢就收好。`);
+  $('mount').value = button.dataset.mount; update();
 }));
 document.querySelectorAll('[data-paper]').forEach(button => {
   const swatch = button.querySelector('canvas');
@@ -178,7 +178,6 @@ document.querySelectorAll('[data-sample]').forEach(button => button.addEventList
   $('lineMode').value = settings.composition === 'album' || button.dataset.sample === 'lanting' ? 'flow' : 'lines';
   pageIndex = 0; update();
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
-  showStudioNote(`《${sample.title}》，这一页慢慢写。`);
 }));
 $('heroSample').addEventListener('click', () => {
   if (busy) return;
@@ -190,7 +189,7 @@ $('composition').addEventListener('change', () => {
   $('rows').value = $('composition').value === 'album' ? 'auto' : '16';
   $('lineMode').value = 'flow'; pageIndex = 0; update();
 });
-$('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); showStudioNote('墨已蘸好，这一纸也换了新气息。'); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
+$('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
 $('previousPage').addEventListener('click', () => { if (pageIndex > 0) { pageIndex--; renderCurrentPage(); } });
 $('nextPage').addEventListener('click', () => { if (pageIndex < layout.pages.length - 1) { pageIndex++; renderCurrentPage(); } });
 
@@ -257,8 +256,7 @@ $('download').addEventListener('click', () => withExport(async () => {
   link.href = url; link.download = `${safeFilename(settings.title)}_第${pageIndex + 1}页.png`;
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30000);
-  toast('高清图片已生成，去下载里收好这一页。');
-  showStudioNote('这页写得用心，记得好好收着。');
+  toast('PNG 已生成。');
 }));
 
 $('print').addEventListener('click', () => withExport(async () => {
@@ -276,7 +274,7 @@ $('print').addEventListener('click', () => withExport(async () => {
     }
     toast('已准备全部册页，请在打印窗口选择「另存为 PDF」。');
     window.print();
-  } finally { $('print').textContent = '整篇存 PDF ↗'; }
+  } finally { $('print').textContent = '整篇 PDF ↗'; }
 }));
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
 initStudioUI(); restoreDraft(); update();
