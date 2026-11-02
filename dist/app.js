@@ -180,6 +180,12 @@ document.querySelectorAll('[data-sample]').forEach(button => button.addEventList
   toast(`已载入《${sample.title}》${layout.pages.length > 1 ? `，完整排为 ${layout.pages.length} 页` : ''}`);
   showStudioNote(`《${sample.title}》，这一页慢慢写。`);
 }));
+$('heroSample').addEventListener('click', () => {
+  if (busy) return;
+  document.querySelector('[data-sample="shanju"]').click();
+  document.querySelector('[data-editor-tab="writing"]').click();
+  $('desk').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+});
 $('composition').addEventListener('change', () => {
   $('rows').value = $('composition').value === 'album' ? 'auto' : '16';
   $('lineMode').value = 'flow'; pageIndex = 0; update();
@@ -234,7 +240,7 @@ async function withExport(action) {
   update();
   if (!layout?.pages.length || busy) return;
   busy = true; syncButtons();
-  const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk, #scene')];
+  const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk, #scene, #heroSample')];
   controls.forEach(control => { control.disabled = true; });
   try { await loadBodyFont(settings.font); await document.fonts.ready; await action(); }
   catch (error) { toast(`导出失败：${error.message || '请稍后重试'}`, true); }
