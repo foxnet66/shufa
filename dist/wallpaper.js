@@ -1,5 +1,5 @@
 import { characters, random, safeFilename } from './layout.js';
-import { wallpaperLayout, WALLPAPER_THEMES } from './wallpaper-layout.js';
+import { wallpaperLayout, WALLPAPER_THEMES, WALLPAPER_INKS, wallpaperInk } from './wallpaper-layout.js';
 import { FONT_FAMILIES } from './renderer.js';
 import { paintPaper, paintPaperTexture } from './paper.js';
 import { drawSeal } from './seal.js';
@@ -8,6 +8,7 @@ import { WALLPAPER_QUOTES, WALLPAPER_CATEGORIES, quoteLayout, restoredQuoteLayou
 
 export function drawWallpaper(canvas, state, inherited) {
   const g = wallpaperLayout(state), theme = WALLPAPER_THEMES[state.theme] || WALLPAPER_THEMES.xuan;
+  const ink=wallpaperInk(state.theme,state.ink);
   canvas.width = g.width; canvas.height = g.height;
   const ctx = canvas.getContext('2d');
   paintPaper(ctx, theme.paper, 1781, g.height, g.width);
@@ -25,7 +26,7 @@ export function drawWallpaper(canvas, state, inherited) {
   const selected = state.font === 'inherit' ? inherited.font : state.font;
   const family = FONT_FAMILIES[BODY_FONTS[selected] && bodyFontState(selected).status !== 'ready' ? 'kai' : selected] || FONT_FAMILIES.kai;
   for(const column of g.columns) {
-    ctx.fillStyle=theme.ink; ctx.font=`${column.size}px ${family}`;
+    ctx.fillStyle=ink; ctx.font=`${column.size}px ${family}`;
     ctx.textAlign='left';ctx.textBaseline='alphabetic';
     for(const [i,char] of column.units.entries()) {
       const m=ctx.measureText(char), w=m.actualBoundingBoxLeft+m.actualBoundingBoxRight;
@@ -40,14 +41,14 @@ export function drawWallpaper(canvas, state, inherited) {
     ctx.drawImage(plate,g.seal.x-g.seal.size/2,g.seal.y-g.seal.size/2,g.seal.size,g.seal.size);
   }
   const author=characters(state.author,true);
-  ctx.font=`32px ${FONT_FAMILIES.song}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=theme.ink;
+  ctx.font=`32px ${FONT_FAMILIES.song}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=ink;
   // Draw each grapheme explicitly; never truncate attribution to fit the footer.
   author.forEach((c,i)=>ctx.fillText(c,g.width/2+(i-(author.length-1)/2)*38,g.height*.94));
   return g;
 }
 
 export function initWallpaperStudio({getSettings,notify}) {
-  const $=id=>document.getElementById(id), ids=['wpMain','wpSub','wpAuthor','wpSeal','wpFont','wpRatio','wpSafeTop','wpClock'];
+  const $=id=>document.getElementById(id), ids=['wpMain','wpSub','wpAuthor','wpSeal','wpFont','wpRatio','wpSafeTop','wpClock','wpInk'];
   const canvas=$('wallpaperCanvas'); let layout='paired',theme='xuan',category='poetry',timer,busy=false,valid=false;
   const matchingQuote=()=>WALLPAPER_QUOTES.find(q=>q.main===$('wpMain').value && q.sub===$('wpSub').value && q.author===$('wpAuthor').value);
   try {
@@ -63,7 +64,7 @@ export function initWallpaperStudio({getSettings,notify}) {
       if(WALLPAPER_THEMES[saved.theme])theme=saved.theme;
     }
   } catch {}
-  const read=()=>({main:$('wpMain').value,sub:$('wpSub').value,author:$('wpAuthor').value,seal:$('wpSeal').value,font:$('wpFont').value,ratio:$('wpRatio').value,safeTop:Number($('wpSafeTop').value),layout,theme});
+  const read=()=>({main:$('wpMain').value,sub:$('wpSub').value,author:$('wpAuthor').value,seal:$('wpSeal').value,font:$('wpFont').value,ratio:$('wpRatio').value,safeTop:Number($('wpSafeTop').value),ink:$('wpInk').value,layout,theme});
   let autoAuthor=!!matchingQuote();
   function showQuotes() {
     document.querySelectorAll('[data-wp-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpCategory===category)));
@@ -84,6 +85,11 @@ export function initWallpaperStudio({getSettings,notify}) {
     $('wpPhone').dataset.theme=theme;
     document.querySelectorAll('[data-wp-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpTheme===theme)));
     document.querySelectorAll('[data-wp-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpLayout===layout)));
+    document.querySelectorAll('[data-wp-ink]').forEach(b=>{
+      b.setAttribute('aria-pressed',String(b.dataset.wpInk===state.ink));
+      b.style.setProperty('--wp-ink',wallpaperInk(theme,b.dataset.wpInk));
+    });
+    $('wpInkNote').textContent=(WALLPAPER_INKS[state.ink] || WALLPAPER_INKS.auto).description+' 正文与落款共用此色，印泥独立。';
     $('wpMainLabel').textContent=layout==='paired'?'上句':'主句';
     $('wpSubLabel').textContent=layout==='paired'?'下句':'辅句';
     try {
@@ -119,6 +125,7 @@ export function initWallpaperStudio({getSettings,notify}) {
   }));
   document.querySelectorAll('[data-wp-layout]').forEach(b=>b.addEventListener('click',()=>{layout=b.dataset.wpLayout;update();}));
   document.querySelectorAll('[data-wp-theme]').forEach(b=>b.addEventListener('click',()=>{theme=b.dataset.wpTheme;update();}));
+  document.querySelectorAll('[data-wp-ink]').forEach(b=>b.addEventListener('click',()=>{$('wpInk').value=b.dataset.wpInk;update();}));
   document.querySelectorAll('[data-wp-category]').forEach(b=>b.addEventListener('click',()=>{
     category=b.dataset.wpCategory;showQuotes();update();
   }));

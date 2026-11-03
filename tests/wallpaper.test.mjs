@@ -1,8 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { wallpaperLayout, WALLPAPER_RATIOS } from '../dist/wallpaper-layout.js';
+import { wallpaperLayout, WALLPAPER_RATIOS, WALLPAPER_THEMES, WALLPAPER_INKS, wallpaperInk } from '../dist/wallpaper-layout.js';
+import { PAPERS } from '../dist/paper.js';
 import { characters } from '../dist/layout.js';
 import { WALLPAPER_QUOTES, quoteLayout, restoredQuoteLayout } from '../dist/wallpaper-quotes.js';
+
+test('every ink scheme stays readable on both light and dark paper bases',()=>{
+  const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+  const luminance=rgb=>rgb.map(c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  for(const [themeId,theme] of Object.entries(WALLPAPER_THEMES)){
+    let base=rgb(PAPERS[theme.paper].base);
+    if(theme.tint){const tint=rgb(theme.tint),alpha=['ink','vermilion'].includes(themeId)?.98:.78;base=base.map((v,i)=>v*(1-alpha)+tint[i]*alpha);}
+    for(const ink of Object.keys(WALLPAPER_INKS)){
+      const a=luminance(base),b=luminance(rgb(wallpaperInk(themeId,ink)));
+      assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,`${themeId}/${ink} loses contrast`);
+    }
+    assert.equal(wallpaperInk(themeId),theme.ink);
+  }
+  assert.equal(wallpaperInk('unknown','unknown'),WALLPAPER_THEMES.xuan.ink);
+  assert.equal(wallpaperInk('ink','constructor'),WALLPAPER_THEMES.ink.ink);
+});
 
 test('poetry has equal size, equal spacing and aligned first characters',()=>{
   const g=wallpaperLayout({main:'长风破浪会有时',sub:'直挂云帆济沧海'});

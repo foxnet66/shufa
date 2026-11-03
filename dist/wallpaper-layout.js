@@ -9,6 +9,21 @@ export const WALLPAPER_THEMES = {
   silk:{ name:'松烟宋锦', paper:'warm', tint:'#c9c5ac', ink:'#384237', accent:'#984c38' }
 };
 
+export const WALLPAPER_INKS = {
+  auto:{name:'随纸配墨',description:'沿用每种纸色的推荐配色。'},
+  ink:{name:'素墨',light:'#262c29',dark:'#f4eee1',description:'浅纸松烟，深纸月白。'},
+  tea:{name:'茶褐',light:'#684431',dark:'#f0d1b1',description:'浅纸茶褐，深纸暖杏。'},
+  jade:{name:'石青',light:'#254e49',dark:'#b9e4d8',description:'浅纸青墨，深纸浅青。'},
+  vermilion:{name:'朱砂',light:'#8c3029',dark:'#ffc6b4',description:'浅纸朱砂，深纸浅赭。'},
+  gold:{name:'泥金',light:'#65511f',dark:'#e8d4a0',description:'浅纸古金，深纸浅金。'}
+};
+
+export function wallpaperInk(themeId, inkId='auto') {
+  const theme=Object.hasOwn(WALLPAPER_THEMES,themeId)?WALLPAPER_THEMES[themeId]:WALLPAPER_THEMES.xuan;
+  if(inkId==='auto' || !Object.hasOwn(WALLPAPER_INKS,inkId))return theme.ink;
+  return WALLPAPER_INKS[inkId][['ink','vermilion'].includes(themeId)?'dark':'light'];
+}
+
 // Explicit bounds keep every grapheme in the composition, including emoji and astral Han.
 export function wallpaperLayout({ main='', sub='', layout='paired', ratio='phone', safeTop=.34 } = {}) {
   const heading = characters(main, true), note = characters(sub, true);
