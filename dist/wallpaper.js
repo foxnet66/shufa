@@ -4,12 +4,7 @@ import { FONT_FAMILIES } from './renderer.js';
 import { paintPaper, paintPaperTexture } from './paper.js';
 import { drawSeal } from './seal.js';
 import { loadBodyFont, bodyFontState, BODY_FONTS } from './body-fonts.js';
-
-const QUOTES = [
-  ['明月松间照','清泉石上流','唐 · 王维'], ['行到水穷处','坐看云起时','唐 · 王维'],
-  ['海上生明月','天涯共此时','唐 · 张九龄'], ['长风破浪会有时','直挂云帆济沧海','唐 · 李白'],
-  ['采菊东篱下','悠然见南山','晋 · 陶渊明'], ['山重水复疑无路','柳暗花明又一村','宋 · 陆游']
-];
+import { WALLPAPER_QUOTES, WALLPAPER_CATEGORIES, quoteLayout, restoredQuoteLayout } from './wallpaper-quotes.js';
 
 export function drawWallpaper(canvas, state, inherited) {
   const g = wallpaperLayout(state), theme = WALLPAPER_THEMES[state.theme] || WALLPAPER_THEMES.xuan;
@@ -53,7 +48,8 @@ export function drawWallpaper(canvas, state, inherited) {
 
 export function initWallpaperStudio({getSettings,notify}) {
   const $=id=>document.getElementById(id), ids=['wpMain','wpSub','wpAuthor','wpSeal','wpFont','wpRatio','wpSafeTop','wpClock'];
-  const canvas=$('wallpaperCanvas'); let layout='staggered',theme='xuan',timer,busy=false,valid=false;
+  const canvas=$('wallpaperCanvas'); let layout='paired',theme='xuan',category='poetry',timer,busy=false,valid=false;
+  const matchingQuote=()=>WALLPAPER_QUOTES.find(q=>q.main===$('wpMain').value && q.sub===$('wpSub').value && q.author===$('wpAuthor').value);
   try {
     const saved=JSON.parse(localStorage.getItem('shufa-wallpaper-v1') || 'null');
     if(saved && typeof saved==='object') {
@@ -62,12 +58,25 @@ export function initWallpaperStudio({getSettings,notify}) {
         if(field.type==='checkbox'){if(typeof value==='boolean')field.checked=value;}
         else if(typeof value==='string' && (field.tagName!=='SELECT' || [...field.options].some(x=>x.value===value)))field.value=value.slice(0,field.maxLength>0?field.maxLength:240);
       }
-      if(['staggered','paired','single'].includes(saved.layout))layout=saved.layout;
+      layout=restoredQuoteLayout(saved,matchingQuote());
+      if(Object.hasOwn(WALLPAPER_CATEGORIES,saved.category))category=saved.category;
       if(WALLPAPER_THEMES[saved.theme])theme=saved.theme;
     }
   } catch {}
   const read=()=>({main:$('wpMain').value,sub:$('wpSub').value,author:$('wpAuthor').value,seal:$('wpSeal').value,font:$('wpFont').value,ratio:$('wpRatio').value,safeTop:Number($('wpSafeTop').value),layout,theme});
-  let autoAuthor=QUOTES.some(q=>q[0]===$('wpMain').value && q[1]===$('wpSub').value && q[2]===$('wpAuthor').value);
+  let autoAuthor=!!matchingQuote();
+  function showQuotes() {
+    document.querySelectorAll('[data-wp-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpCategory===category)));
+    $('wpQuoteNote').textContent=category==='poetry'?'诗词默认等大对读；选句后仍可自选章法。':'以下为本站拟写的日常寄语，不署古人名；选用后可自由改写。';
+    $('wpQuoteList').replaceChildren(...WALLPAPER_QUOTES.filter(q=>q.category===category).map(quote=>{
+      const button=document.createElement('button');button.type='button';button.textContent=quote.main;
+      button.title=quote.main+' · '+quote.sub;
+      button.addEventListener('click',()=>{
+        $('wpMain').value=quote.main;$('wpSub').value=quote.sub;$('wpAuthor').value=quote.author;
+        layout=quoteLayout(quote);autoAuthor=true;update();
+      });return button;
+    }));
+  }
   const fontId=()=>read().font==='inherit'?getSettings().font:read().font;
   function update() {
     clearTimeout(timer); const state=read(), inherited=getSettings();
@@ -75,10 +84,12 @@ export function initWallpaperStudio({getSettings,notify}) {
     $('wpPhone').dataset.theme=theme;
     document.querySelectorAll('[data-wp-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpTheme===theme)));
     document.querySelectorAll('[data-wp-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpLayout===layout)));
+    $('wpMainLabel').textContent=layout==='paired'?'上句':'主句';
+    $('wpSubLabel').textContent=layout==='paired'?'下句':'辅句';
     try {
       const g=drawWallpaper(canvas,state,inherited);valid=g.columns.length>0;
       $('wpDimensions').textContent=`${g.width} × ${g.height} PNG`;
-      $('wpStatus').textContent=valid?'主句最多 24 字，副句最多 60 字。壁纸草稿独立保存。':'填入一句喜欢的话，即可生成壁纸。';
+      $('wpStatus').textContent=valid?(layout==='paired'?'上句最多 24 字，下句最多 60 字。':'主句最多 24 字，辅句最多 60 字。')+'壁纸草稿独立保存。':'填入一句喜欢的话，即可生成壁纸。';
       $('wpStatus').classList.remove('wp-error');
       if($('wpDialog').open)drawWallpaper($('wpLarge'),state,inherited);
       const id=fontId(), status=bodyFontState(id).status;
@@ -94,7 +105,7 @@ export function initWallpaperStudio({getSettings,notify}) {
         const missing=[...new Set(characters(state.main+state.sub,true))].filter(c=>coverage && !coverage.has(c.codePointAt(0)));
         if(missing.length)$('wpStatus').textContent+=`「${missing.slice(0,6).join('、')}」等 ${missing.length} 字将使用设备后备字体。`;
       }
-      try {localStorage.setItem('shufa-wallpaper-v1',JSON.stringify({...Object.fromEntries(ids.map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value])),layout,theme}));}catch{$('wpStatus').textContent+=' 本机存储不可用。';}
+      try {localStorage.setItem('shufa-wallpaper-v1',JSON.stringify({...Object.fromEntries(ids.map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value])),layout,theme,category,version:2}));}catch{$('wpStatus').textContent+=' 本机存储不可用。';}
     } catch(error) {
       valid=false;canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
       $('wpDownload').disabled=$('wpInspect').disabled=true;
@@ -108,15 +119,15 @@ export function initWallpaperStudio({getSettings,notify}) {
   }));
   document.querySelectorAll('[data-wp-layout]').forEach(b=>b.addEventListener('click',()=>{layout=b.dataset.wpLayout;update();}));
   document.querySelectorAll('[data-wp-theme]').forEach(b=>b.addEventListener('click',()=>{theme=b.dataset.wpTheme;update();}));
-  document.querySelectorAll('[data-wp-quote]').forEach(b=>b.addEventListener('click',()=>{
-    const quote=QUOTES[Number(b.dataset.wpQuote)];
-    ['wpMain','wpSub','wpAuthor'].forEach((id,i)=>$(id).value=quote[i]);autoAuthor=true;update();
+  document.querySelectorAll('[data-wp-category]').forEach(b=>b.addEventListener('click',()=>{
+    category=b.dataset.wpCategory;showQuotes();update();
   }));
   $('wpFromPoem').addEventListener('click',()=>{
     const original=getSettings(),clauses=original.body.split(/[，。！？；,.!?;\n]+/u).map(x=>x.trim()).filter(Boolean);
     if(!clauses.length){notify('请先在册页中录入诗文。',true);return;}
     if(characters(clauses[0],true).length>24 || characters(clauses[1]||'',true).length>60){notify('这一段较长，请自行选句填写；原文未作截取。',true);return;}
-    $('wpMain').value=clauses[0];$('wpSub').value=clauses[1]||'';$('wpAuthor').value=original.author;autoAuthor=true;update();
+    $('wpMain').value=clauses[0];$('wpSub').value=clauses[1]||'';$('wpAuthor').value=original.author;
+    layout='paired';category='poetry';showQuotes();autoAuthor=true;update();
   });
   $('wpInspect').addEventListener('click',()=>{update();if(!valid)return;drawWallpaper($('wpLarge'),read(),getSettings());$('wpDialog').showModal();document.body.classList.add('viewing-art');});
   $('wpClose').addEventListener('click',()=>$('wpDialog').close());
@@ -134,5 +145,5 @@ export function initWallpaperStudio({getSettings,notify}) {
   document.fonts.addEventListener('loadingdone',update);
   // Refresh inherited fonts and seal settings after the main editor changes.
   document.querySelector('.editor').addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(update,250);});
-  update();return {update};
+  showQuotes();update();return {update};
 }

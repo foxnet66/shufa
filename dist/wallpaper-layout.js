@@ -10,19 +10,19 @@ export const WALLPAPER_THEMES = {
 };
 
 // Explicit bounds keep every grapheme in the composition, including emoji and astral Han.
-export function wallpaperLayout({ main='', sub='', layout='staggered', ratio='phone', safeTop=.34 } = {}) {
+export function wallpaperLayout({ main='', sub='', layout='paired', ratio='phone', safeTop=.34 } = {}) {
   const heading = characters(main, true), note = characters(sub, true);
-  if (heading.length > 24 || note.length > 60) throw new RangeError('主句最多 24 字，副句最多 60 字。');
+  if (heading.length > 24 || note.length > 60) throw new RangeError(layout === 'paired' ? '上句最多 24 字，下句最多 60 字。' : '主句最多 24 字，辅句最多 60 字。');
   const { width, height } = WALLPAPER_RATIOS[ratio] || WALLPAPER_RATIOS.phone;
   const top = height * Math.max(.25, Math.min(.45, Number(safeTop) || .34));
   const bottom = height * .84, available = bottom - top;
   const columns = [];
   const add = (units, x, y, size, step, kind) => { if(units.length) columns.push({units,x,y,size,step,kind}); };
   if (layout === 'paired') {
-    const size = Math.min(135, available / Math.max(1, heading.length, note.length) * .75);
+    const size = Math.min(165, available / Math.max(1, heading.length, note.length) * .75);
     const step = Math.min(size * 1.4, available / Math.max(1, heading.length, note.length));
-    add(heading, width * .62, top, size, step, 'main');
-    add(note, width * .38, top + size * .7, size * .78, Math.min(step, (available-size*.7)/Math.max(1,note.length)), 'sub');
+    add(heading, width * (note.length ? .60 : .5), top, size, step, 'main');
+    add(note, width * (heading.length ? .40 : .5), top, size, step, 'sub');
   } else {
     const mainRows = layout === 'single' ? 12 : 8;
     const mainColumns = Math.max(1, Math.ceil(heading.length / mainRows));
