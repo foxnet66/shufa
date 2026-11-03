@@ -1,7 +1,7 @@
 import { characters, random, safeFilename } from './layout.js';
 import { wallpaperLayout, WALLPAPER_THEMES } from './wallpaper-layout.js';
 import { FONT_FAMILIES } from './renderer.js';
-import { paintPaper } from './paper.js';
+import { paintPaper, paintPaperTexture } from './paper.js';
 import { drawSeal } from './seal.js';
 import { loadBodyFont, bodyFontState, BODY_FONTS } from './body-fonts.js';
 
@@ -19,13 +19,9 @@ export function drawWallpaper(canvas, state, inherited) {
   if (theme.tint) {
     ctx.save(); ctx.globalAlpha = ['ink','vermilion'].includes(state.theme) ? .98 : .78;
     ctx.fillStyle = theme.tint; ctx.fillRect(0,0,g.width,g.height); ctx.restore();
+    paintPaperTexture(ctx, theme.paper, 1781, g.height, g.width, { dark:['ink','vermilion'].includes(state.theme), weave:state.theme==='silk' });
   }
   const rng = random(1781);
-  if (state.theme === 'silk') {
-    ctx.strokeStyle = '#67746112'; ctx.lineWidth = .8;
-    for (let x=0;x<g.width;x+=5) {ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,g.height);ctx.stroke();}
-    for (let y=0;y<g.height;y+=6) {ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(g.width,y);ctx.stroke();}
-  }
   if (state.theme === 'ink' || state.theme === 'vermilion') {
     for(let i=0;i<500;i++){ctx.fillStyle=`rgba(231,205,151,${rng()*.16})`;ctx.fillRect(rng()*g.width,rng()*g.height,1+rng()*3,1+rng()*4);}
   }

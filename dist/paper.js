@@ -7,6 +7,52 @@ export const PAPERS = {
   aged: { name: '淡茶旧笺', description: '浅茶底色，柔和云纹；旧意点到为止。', base: '#eae0c8', fiber: '116,88,52', grain: .027, fiberCount: 1800, length: 20, edge: .048 }
 };
 
+// Multi-scale pulp and fibres remain visible when a full sheet is reduced to a preview.
+// Draw on top of the chosen base colour, before any lettering; no external texture files.
+export function paintPaperTexture(ctx, type, seed, height = 2000, width = 1600, { dark = false, weave = false } = {}) {
+  const paper = PAPERS[type] || PAPERS.warm, rng = random(seed ^ 0x28e4f31b);
+  ctx.save();
+  const shadow = dark ? [8, 17, 15] : paper.fiber.split(',').map(Number);
+  const light = dark ? [216, 205, 172] : [255, 253, 245];
+  const layer = (spacing, opacity) => {
+    const tile = document.createElement('canvas');
+    tile.width = Math.ceil(width / spacing); tile.height = Math.ceil(height / spacing);
+    const tc = tile.getContext('2d'), pixels = tc.createImageData(tile.width, tile.height);
+    for (let i = 0; i < pixels.data.length; i += 4) {
+      const density = (rng() + rng() + rng()) / 3 - .5, color = density > 0 ? light : shadow;
+      pixels.data[i] = color[0]; pixels.data[i + 1] = color[1]; pixels.data[i + 2] = color[2];
+      pixels.data[i + 3] = Math.round(Math.abs(density) * opacity);
+    }
+    tc.putImageData(pixels, 0, 0); ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(tile, 0, 0, width, height);
+  };
+  layer(55, type === 'white' ? 24 : 38);
+  layer(7, type === 'white' ? 65 : 95);
+  ctx.lineCap = 'round';
+  const fibres = Math.min(4200, Math.round(width * height / (type === 'white' ? 2400 : 1000)));
+  for (let i = 0; i < fibres; i++) {
+    const x = rng() * width, y = rng() * height, angle = rng() * Math.PI;
+    const length = (type === 'white' ? 6 : 18) + rng() * (type === 'white' ? 20 : 65);
+    const dx = Math.cos(angle) * length, dy = Math.sin(angle) * length;
+    ctx.strokeStyle = `rgba(${i % 3 ? shadow.join(',') : light.join(',')},${.045 + rng() * (dark ? .085 : .13)})`;
+    ctx.lineWidth = .65 + rng() * 1.25;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + dx * .52 + 2, y + dy * .45, x + dx, y + dy); ctx.stroke();
+  }
+  if (weave) {
+    for (let x = 0; x < width; x += 12) {
+      ctx.strokeStyle = 'rgba(61,76,56,.10)'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,250,221,.19)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x + 2, 0); ctx.lineTo(x + 2, height); ctx.stroke();
+    }
+    for (let y = 0; y < height; y += 11) {
+      ctx.strokeStyle = 'rgba(72,71,46,.075)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
 export function paintPaper(ctx, type, seed, height = 2000, width = 1600) {
   const paper = PAPERS[type] || PAPERS.warm;
   const rng = random(seed ^ 0x61c88647);
@@ -39,4 +85,5 @@ export function paintPaper(ctx, type, seed, height = 2000, width = 1600) {
   edge.addColorStop(.65, `rgba(${paper.fiber},0)`);
   edge.addColorStop(1, `rgba(${paper.fiber},${paper.edge})`);
   ctx.fillStyle = edge; ctx.fillRect(0, 0, width, height);
+  paintPaperTexture(ctx, type, seed, height, width);
 }
