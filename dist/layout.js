@@ -15,8 +15,14 @@ export function verseRows(text) {
 }
 
 export function pageGeometry(settings) {
-  const album = settings.composition === 'album';
-  return { width: 1600, height: album ? 1760 : 2000, left: 126, right: 1474, top: album ? 116 : 180, bottom: album ? 1600 : 1770, album };
+  const scroll = settings.composition === 'scroll';
+  const album = settings.composition === 'album' || scroll;
+  const width = scroll ? settings.columns * 120 + 252 : 1600;
+  return { width, height: album ? 1760 : 2000, left: 126, right: width - 126, top: album ? 116 : 180, bottom: album ? 1600 : 1770, album, scroll };
+}
+
+export function exportWidth(settings) {
+  return settings.composition === 'scroll' ? Math.min(7200, Math.max(2400, Math.round(pageGeometry(settings).width * 1.5))) : 2400;
 }
 
 export function titleColumn(settings) {
@@ -37,12 +43,12 @@ export function verticalCenters(heights, step, top) {
 }
 
 export function paginate(text, { columns = 10, rows = 16, keepPunctuation = false, lineMode = 'flow', composition = 'free' } = {}) {
-  if (!Number.isInteger(columns) || columns < 6 || columns > 12 || !Number.isInteger(rows) || rows < 10 || rows > 22) {
+  if (!Number.isInteger(columns) || columns < 6 || columns > (composition === 'scroll' ? 36 : 12) || !Number.isInteger(rows) || rows < 10 || rows > 22) {
     throw new RangeError('章法参数超出范围');
   }
   const chars = characters(text, keepPunctuation);
   if (chars.length > MAX_CHARACTERS) throw new RangeError(`正文最多支持 ${MAX_CHARACTERS} 字，请分篇制作。`);
-  const bodyColumns = columns - (composition === 'album' ? 1 : 2);
+  const bodyColumns = columns - (['album', 'scroll'].includes(composition) ? 1 : 2);
   const capacity = bodyColumns * rows;
   const pages = [];
   const textColumns = [];

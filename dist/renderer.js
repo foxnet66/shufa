@@ -44,12 +44,12 @@ function stamp(ctx, signature, settings) {
 export function drawArtwork(canvas, page, settings, pageIndex, pageCount, width = 1600) {
   canvas.width = width;
   const geometry = pageGeometry(settings);
-  canvas.height = Math.round(width * geometry.height / 1600);
+  canvas.height = Math.round(width * geometry.height / geometry.width);
   const ctx = canvas.getContext('2d');
-  ctx.scale(width / 1600, width / 1600);
+  ctx.scale(width / geometry.width, width / geometry.width);
   const rng = random(settings.seed + pageIndex * 271);
   const cool = settings.paper === 'white';
-  paintPaper(ctx, settings.paper, settings.seed + pageIndex * 271, geometry.height);
+  paintPaper(ctx, settings.paper, settings.seed + pageIndex * 271, geometry.height, geometry.width);
 
   const { left, right, top, bottom, album } = geometry;
   const cw = (right - left) / settings.columns;
@@ -104,7 +104,7 @@ export function drawArtwork(canvas, page, settings, pageIndex, pageCount, width 
   if (pageCount > 1) {
     ctx.font = `23px ${FONT_FAMILIES.song}`;
     ctx.fillStyle = 'rgba(100,80,55,.45)';
-    ctx.fillText(`${pageIndex + 1} / ${pageCount}`, 800, geometry.height - 70);
+    ctx.fillText(`${pageIndex + 1} / ${pageCount}`, geometry.width / 2, geometry.height - 70);
   }
   return canvas;
 }

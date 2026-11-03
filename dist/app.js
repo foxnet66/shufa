@@ -1,4 +1,5 @@
-import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows } from './layout.js';
+import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows, exportWidth } from './layout.js';
+import { initArtViewer } from './art-viewer.js';
 import { drawPage } from './renderer.js';
 import { PAPERS, paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
@@ -16,6 +17,17 @@ let seed = 915, pageIndex = 0, layout, settings, timer, toastTimer;
 let loadedFont = null, fontRequest = 0, busy = false;
 let sealReady = false, sealLoading = true, customSealFont = null, customSealCoverage = null, sealFontRequest = 0;
 const canvas = $('artwork');
+const viewer = initArtViewer({
+  render(target) {
+    if (!layout?.pages.length) return null;
+    drawPage(target, layout.pages[pageIndex], settings, pageIndex, layout.pages.length, Math.min(5400, exportWidth(settings)));
+    return { title:settings.title, index:pageIndex, count:layout.pages.length };
+  },
+  navigate(direction) {
+    if (busy || !layout?.pages.length) return;
+    pageIndex = Math.max(0, Math.min(layout.pages.length - 1, pageIndex + direction)); renderCurrentPage();
+  }
+});
 
 function toast(message, error = false) {
   clearTimeout(toastTimer);
@@ -25,6 +37,9 @@ function toast(message, error = false) {
 }
 
 function readSettings() {
+  const scroll = $('composition').value === 'scroll';
+  for (const option of $('columns').options) option.hidden = !scroll && Number(option.value) > 12;
+  if (!scroll && Number($('columns').value) > 12) $('columns').value = '10';
   const data = Object.fromEntries(fields.map(id => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
   return { ...data, columns: Number(data.columns), rows: data.rows === 'auto' ? verseRows(data.body).rows : Number(data.rows), keepPunctuation: data.punctuation, style: document.querySelector('input[name="style"]:checked').value, seed };
 }
@@ -64,6 +79,7 @@ function syncButtons() {
   const awaitingBody = BODY_FONTS[settings?.font] && bodyFontState(settings.font).status !== 'ready';
   $('download').disabled = empty || busy || awaitingFont || awaitingBody;
   $('print').disabled = empty || busy || awaitingFont || awaitingBody;
+  $('inspectArtwork').disabled = empty || busy;
   $('previousPage').disabled = empty || pageIndex === 0 || busy;
   $('nextPage').disabled = empty || pageIndex >= layout.pages.length - 1 || busy;
 }
@@ -77,6 +93,7 @@ function renderCurrentPage() {
   $('pageInfo').textContent = `${layout?.count || 0} 字`;
   if (layout?.pages.length && settings.lineMode === 'lines') $('pageInfo').textContent = `${layout.count} 字 · 本页 ${layout.pages[pageIndex].columns.length} 列`;
   syncButtons();
+  viewer.refresh();
 }
 
 function update() {
@@ -127,11 +144,13 @@ function update() {
   const geometry = mountGeometry(settings);
   canvas.parentElement.dataset.mounted = String(geometry.mount !== 'none');
   canvas.style.aspectRatio = `${geometry.width} / ${geometry.height}`;
-  $('exportDimensions').textContent = `高清 PNG · 2400 × ${Math.round(2400 * geometry.height / geometry.width)} 像素${geometry.mount === 'none' ? '' : ' · 含装裱'}`;
+  const outputWidth = exportWidth(settings);
+  document.querySelector('.paper-stage').classList.toggle('scroll-stage', settings.composition === 'scroll');
+  $('exportDimensions').textContent = `高清 PNG · ${outputWidth} × ${Math.round(outputWidth * geometry.height / geometry.width)} 像素${geometry.mount === 'none' ? '' : ' · 含装裱'}`;
   document.querySelectorAll('[data-mount]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mount === settings.mount)));
   $('mountDescription').textContent = (MOUNTS[settings.mount] || MOUNTS.none).description;
   const genre = verseRows(settings.body).genre;
-  $('layoutDescription').textContent = `${$('rows').value === 'auto' ? genre + ' · 自动' : '自定'} ${settings.columns} 列 × ${settings.rows} 字；${settings.composition === 'album' ? '右列题名、落款与钤印' : '落款跟随正文末列'}。`;
+  $('layoutDescription').textContent = `${$('rows').value === 'auto' ? genre + ' · 自动' : '自定'} ${settings.columns} 列 × ${settings.rows} 字；${settings.composition !== 'free' ? '右列题名、落款与钤印' : '落款跟随正文末列'}。`;
   document.querySelectorAll('[data-paper]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.paper === settings.paper)));
   $('paperDescription').textContent = (PAPERS[settings.paper] || PAPERS.warm).description;
   document.querySelectorAll('[data-sample]').forEach(button => {
@@ -191,12 +210,16 @@ $('classicUndo').addEventListener('click', () => {
 });
 $('heroSample').addEventListener('click', () => {
   if (busy) return;
-  document.querySelector('[data-sample="shanju"]').click();
+  $('composition').value = 'scroll'; $('columns').value = '24'; $('rows').value = '14';
+  $('font').value = 'mashan'; $('mount').value = 'silk'; $('paper').value = 'white';
+  loadClassic('lanting');
   document.querySelector('[data-editor-tab="writing"]').click();
   $('desk').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
 });
 $('composition').addEventListener('change', () => {
-  $('rows').value = $('composition').value === 'album' ? 'auto' : '16';
+  const scroll = $('composition').value === 'scroll';
+  $('columns').value = scroll ? '24' : '10';
+  $('rows').value = scroll ? '14' : $('composition').value === 'album' ? 'auto' : '16';
   $('lineMode').value = 'flow'; pageIndex = 0; update();
 });
 $('newInk').addEventListener('click', () => { seed = (seed + 7919) >>> 0; update(); if (!$('natural').checked) toast('开启「自然墨色」可同时调整笔墨浓淡。'); });
@@ -259,7 +282,7 @@ async function withExport(action) {
 
 $('download').addEventListener('click', () => withExport(async () => {
   const output = document.createElement('canvas');
-  drawPage(output, layout.pages[pageIndex], settings, pageIndex, layout.pages.length, 2400);
+  drawPage(output, layout.pages[pageIndex], settings, pageIndex, layout.pages.length, exportWidth(settings));
   const blob = await new Promise(resolve => output.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('浏览器未能生成图片');
   const url = URL.createObjectURL(blob);
@@ -289,6 +312,14 @@ $('print').addEventListener('click', () => withExport(async () => {
 }));
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
 initStudioUI(); restoreDraft(); initClassicsLibrary(loadClassic); update();
+
+function renderHero() {
+  const hero = { ...settings, ...samples.lanting, composition:'scroll', columns:24, rows:14, font:'mashan', bodyRenderFont:bodyFontState('mashan').status === 'ready' ? 'mashan' : 'kai', paper:'white', mount:'silk', style:'clean', lineMode:'flow', keepPunctuation:false, natural:true, seal:'自在', sealFont:'seal', sealRenderFont:sealReady ? 'seal' : 'kai', sealStyle:'intaglio', sealTexture:'fresh', colophon:'', ink:'balanced', seed:915 };
+  const pages = paginate(hero.body, hero).pages;
+  drawPage($('heroArtwork'), pages[0], hero, 0, pages.length, 1800);
+}
+renderHero();
+loadBodyFont('mashan').then(renderHero).catch(() => {});
 document.fonts.ready.then(renderCurrentPage);
 const builtinSeal = new FontFace('CNSSeal', `url("${new URL('./fonts/CNS-ShuoWen.ttf', import.meta.url).href}")`);
-builtinSeal.load().then(face => { document.fonts.add(face); sealReady = true; }).catch(() => { sealReady = false; }).finally(() => { sealLoading = false; update(); });
+builtinSeal.load().then(face => { document.fonts.add(face); sealReady = true; }).catch(() => { sealReady = false; }).finally(() => { sealLoading = false; update(); renderHero(); });

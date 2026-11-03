@@ -7,26 +7,26 @@ export const PAPERS = {
   aged: { name: '淡茶旧笺', description: '浅茶底色，柔和云纹；旧意点到为止。', base: '#eae0c8', fiber: '116,88,52', grain: .027, fiberCount: 1800, length: 20, edge: .048 }
 };
 
-export function paintPaper(ctx, type, seed, height = 2000) {
+export function paintPaper(ctx, type, seed, height = 2000, width = 1600) {
   const paper = PAPERS[type] || PAPERS.warm;
   const rng = random(seed ^ 0x61c88647);
   ctx.fillStyle = paper.base;
-  ctx.fillRect(0, 0, 1600, height);
+  ctx.fillRect(0, 0, width, height);
   // Soft variations in pulp density, without a directional yellow wash.
   for (let i = 0; i < 20; i++) {
-    const x = rng() * 1600, y = rng() * height, radius = 150 + rng() * 380;
+    const x = rng() * width, y = rng() * height, radius = 150 + rng() * 380;
     const wash = ctx.createRadialGradient(x, y, 0, x, y, radius);
     wash.addColorStop(0, i % 2 ? 'rgba(255,255,255,.055)' : `rgba(${paper.fiber},.012)`);
     wash.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = wash; ctx.fillRect(0, 0, 1600, height);
+    ctx.fillStyle = wash; ctx.fillRect(0, 0, width, height);
   }
   for (let i = 0; i < 17000; i++) {
     ctx.fillStyle = `rgba(${paper.fiber},${rng() * paper.grain})`;
-    ctx.fillRect(rng() * 1600, rng() * height, .35 + rng() * 1.15, .35 + rng() * 1.5);
+    ctx.fillRect(rng() * width, rng() * height, .35 + rng() * 1.15, .35 + rng() * 1.5);
   }
   ctx.lineCap = 'round';
   for (let i = 0; i < paper.fiberCount; i++) {
-    const x = rng() * 1600, y = rng() * height, angle = rng() * Math.PI;
+    const x = rng() * width, y = rng() * height, angle = rng() * Math.PI;
     const length = 3 + rng() * paper.length;
     ctx.strokeStyle = `rgba(${paper.fiber},${.018 + rng() * .025})`;
     ctx.lineWidth = .25 + rng() * .4;
@@ -34,9 +34,9 @@ export function paintPaper(ctx, type, seed, height = 2000) {
     ctx.quadraticCurveTo(x + Math.cos(angle) * length * .55 + 1.5, y + Math.sin(angle) * length * .55, x + Math.cos(angle) * length, y + Math.sin(angle) * length);
     ctx.stroke();
   }
-  const edge = ctx.createRadialGradient(800, height / 2, 450, 800, height / 2, 1350);
+  const edge = ctx.createRadialGradient(width / 2, height / 2, 450, width / 2, height / 2, Math.max(width, height) * .75);
   edge.addColorStop(0, `rgba(${paper.fiber},0)`);
   edge.addColorStop(.65, `rgba(${paper.fiber},0)`);
   edge.addColorStop(1, `rgba(${paper.fiber},${paper.edge})`);
-  ctx.fillStyle = edge; ctx.fillRect(0, 0, 1600, height);
+  ctx.fillStyle = edge; ctx.fillRect(0, 0, width, height);
 }

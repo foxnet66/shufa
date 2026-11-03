@@ -1,6 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paginate, characters, safeFilename, signaturePosition, verseRows, pageGeometry, verticalCenters } from '../dist/layout.js';
+import { paginate, characters, safeFilename, signaturePosition, verseRows, pageGeometry, verticalCenters, exportWidth } from '../dist/layout.js';
+
+test('handscrolls preserve all 4000 characters across bounded panoramic sheets', () => {
+  const body = '春'.repeat(4000);
+  for (const columns of [16, 24, 36]) {
+    const settings = { composition:'scroll', columns, rows:14, title:'兰亭集序', author:'王羲之', seal:'自在' };
+    const result = paginate(body, settings);
+    assert.equal(result.pages.flatMap(p => p.columns.flat()).join(''), body);
+    assert.equal(result.capacity, (columns - 1) * 14);
+    const g = pageGeometry(settings);
+    assert.equal((g.right - g.left) / columns, 120);
+    assert.ok(g.width > g.height);
+    for (const [i, page] of result.pages.entries()) {
+      assert.ok(page.columns.length <= columns - 1);
+      const signature = signaturePosition(page, settings, i === result.pages.length - 1);
+      assert.ok(signature.x > g.right - 120 && signature.x < g.right);
+      assert.ok(signature.sealY + signature.sealSize / 2 < g.bottom);
+      if (i < result.pages.length - 1) assert.equal(signature.sealChars.length, 0);
+    }
+    assert.ok(exportWidth(settings) >= g.width);
+    assert.ok(exportWidth(settings) <= 7200);
+  }
+  assert.throws(() => paginate(body, {composition:'album',columns:24,rows:14}), RangeError);
+  assert.throws(() => paginate(body, {composition:'scroll',columns:37,rows:14}), RangeError);
+});
+
+test('handscroll line breaks do not drop sparse columns or astral characters', () => {
+  const body = ('𠮷春江\n\n明月松间照\n').repeat(80);
+  const result = paginate(body, {composition:'scroll',columns:24,rows:14,lineMode:'lines'});
+  assert.equal(result.pages.flatMap(p => p.columns.flat()).join(''), characters(body).join(''));
+  assert.equal(result.pages.length, Math.ceil(160 / 23));
+});
 
 test('long text is preserved across pages in right-to-left column order', () => {
   const text = Array.from({ length: 397 }, (_, i) => String.fromCodePoint(0x4e00 + i)).join('');
