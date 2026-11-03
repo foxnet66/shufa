@@ -9,12 +9,13 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./studio.css">
+  <link rel="stylesheet" href="./wallpaper.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="./" aria-label="书法排版工具首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>书法排版</span></a>
-    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头</a></nav>
+    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头</a><a href="#wallpaper">诗笺壁纸</a></nav>
   </header>
   <main>
     <section class="intro" aria-label="书法创作介绍">
@@ -89,6 +90,19 @@
         <p class="print-help">PDF：在打印窗口选择「另存为 PDF」，关闭页眉页脚。</p>
       </section>
     </div>
+    <section id="wallpaper" class="wallpaper-studio" aria-labelledby="wallpaperHeading">
+      <div class="wallpaper-heading"><div><span>随身一纸</span><h2 id="wallpaperHeading">诗笺壁纸</h2></div><p>留一点空白，把喜欢的字带在身边。</p></div>
+      <div class="wallpaper-grid"><div class="wallpaper-editor">
+        <fieldset><legend>章法</legend><div class="wp-layouts"><button type="button" data-wp-layout="staggered" aria-pressed="true"><b>一主一副</b><small>大小相映 · 错落成笺</small></button><button type="button" data-wp-layout="paired" aria-pressed="false"><b>双句对读</b><small>左右相和 · 一联入画</small></button><button type="button" data-wp-layout="single" aria-pressed="false"><b>独句留白</b><small>疏朗一列 · 余韵悠长</small></button></div></fieldset>
+        <fieldset><legend>纸色</legend><div class="wp-themes"><button type="button" data-wp-theme="xuan" aria-pressed="true">月白素宣</button><button type="button" data-wp-theme="celadon" aria-pressed="false">青瓷听雨</button><button type="button" data-wp-theme="ink" aria-pressed="false">黛墨泥金</button><button type="button" data-wp-theme="vermilion" aria-pressed="false">朱笺寄愿</button><button type="button" data-wp-theme="silk" aria-pressed="false">松烟宋锦</button></div></fieldset>
+        <div class="field-pair"><label for="wpMain">主句<input id="wpMain" maxlength="96" value="明月松间照" autocomplete="off"></label><label for="wpSub">副句<input id="wpSub" maxlength="240" value="清泉石上流" autocomplete="off"></label></div>
+        <div class="field-pair"><label for="wpAuthor">出处或落款<input id="wpAuthor" maxlength="20" value="唐 · 王维" autocomplete="off"></label><label for="wpSeal">印文<input id="wpSeal" maxlength="4" value="自在" autocomplete="off"></label></div>
+        <button id="wpFromPoem" class="wp-from-poem" type="button">从册页取句</button><fieldset><legend>选句</legend><div class="wp-quotes"><button type="button" data-wp-quote="0">明月松间照</button><button type="button" data-wp-quote="1">行到水穷处</button><button type="button" data-wp-quote="2">海上生明月</button><button type="button" data-wp-quote="3">长风破浪会有时</button><button type="button" data-wp-quote="4">采菊东篱下</button><button type="button" data-wp-quote="5">山重水复疑无路</button></div></fieldset>
+        <div class="field-pair"><label for="wpFont">壁纸字体<select id="wpFont"><option value="mashan">马善政楷书</option><option value="longcang">龙藏手写体</option><option value="inherit">沿用册页字体</option></select></label><label for="wpRatio">画幅<select id="wpRatio"><option value="phone">手机长屏 · 6:13</option><option value="wide">经典竖屏 · 9:16</option><option value="card">诗签卡片 · 3:4</option></select></label></div>
+        <div class="field-pair"><label for="wpSafeTop">锁屏留白<select id="wpSafeTop"><option value="0.28">少 · 28%</option><option value="0.34" selected>适中 · 34%</option><option value="0.42">多 · 42%</option></select></label><label class="wp-clock-toggle"><input id="wpClock" type="checkbox" checked>时钟参考（不导出）</label></div>
+        <p id="wpStatus" role="status">主句最多 24 字，副句最多 60 字。壁纸草稿独立保存。</p>
+      </div><div class="wallpaper-preview"><div class="wp-preview-top"><h3>掌中预览</h3><button id="wpInspect" type="button">放大鉴赏</button></div><div class="wp-phone" id="wpPhone"><canvas id="wallpaperCanvas" width="1440" height="3120" role="img" aria-label="诗笺壁纸预览"></canvas><div class="wp-clock" id="wpClockOverlay" aria-hidden="true"><span>星期二</span><strong>09:41</strong></div></div><div class="wp-export"><span id="wpDimensions">1440 × 3120 PNG</span><button id="wpDownload" type="button">保存壁纸</button></div><p class="wp-export-note">纯净原图 · 时钟与界面均不随图导出</p></div></div>
+    </section>
     <footer class="site-footer"><span>文字与草稿仅存本机</span><a href="https://github.com/foxnet66/shufa/blob/main/LICENSE" target="_blank" rel="noopener">MIT 开源</a></footer>
   </main>
   <dialog id="artViewer" class="art-viewer" aria-labelledby="viewerTitle">
@@ -97,6 +111,7 @@
     <div id="viewerStage" class="viewer-stage" tabindex="0" aria-label="作品鉴赏区域，可滚动或拖动"><canvas id="viewerCanvas" role="img" aria-label="高清作品"></canvas></div>
     <p class="viewer-help">滚轮缩放 · 拖动阅卷 · 左右键翻页 · Esc 收卷</p>
   </dialog>
+  <dialog id="wpDialog" class="wp-dialog" aria-label="壁纸放大鉴赏"><button id="wpClose" type="button" autofocus>收起</button><canvas id="wpLarge" role="img" aria-label="壁纸大图"></canvas></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <div id="printRoot" aria-hidden="true"></div>
 </body>

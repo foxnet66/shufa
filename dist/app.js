@@ -1,5 +1,6 @@
 import { paginate, characters, MAX_CHARACTERS, safeFilename, verseRows, exportWidth } from './layout.js';
 import { initArtViewer } from './art-viewer.js';
+import { initWallpaperStudio } from './wallpaper.js';
 import { drawPage } from './renderer.js';
 import { PAPERS, paintPaper } from './paper.js';
 import { drawSeal } from './seal.js';
@@ -14,6 +15,7 @@ import { initClassicsLibrary } from './classics-ui.js';
 const $ = id => document.getElementById(id);
 const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle', 'sealFont', 'sealTexture', 'mount', 'scene'];
 let seed = 915, pageIndex = 0, layout, settings, timer, toastTimer;
+let wallpaperStudio;
 let loadedFont = null, fontRequest = 0, busy = false;
 let sealReady = false, sealLoading = true, customSealFont = null, customSealCoverage = null, sealFontRequest = 0;
 const canvas = $('artwork');
@@ -94,6 +96,7 @@ function renderCurrentPage() {
   if (layout?.pages.length && settings.lineMode === 'lines') $('pageInfo').textContent = `${layout.count} 字 · 本页 ${layout.pages[pageIndex].columns.length} 列`;
   syncButtons();
   viewer.refresh();
+  wallpaperStudio?.update();
 }
 
 function update() {
@@ -319,6 +322,7 @@ function renderHero() {
   drawPage($('heroArtwork'), pages[0], hero, 0, pages.length, 1800);
 }
 renderHero();
+wallpaperStudio = initWallpaperStudio({ getSettings:() => ({...settings, sealPending:sealLoading}), notify:toast });
 loadBodyFont('mashan').then(renderHero).catch(() => {});
 document.fonts.ready.then(renderCurrentPage);
 const builtinSeal = new FontFace('CNSSeal', `url("${new URL('./fonts/CNS-ShuoWen.ttf', import.meta.url).href}")`);
