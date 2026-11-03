@@ -3,6 +3,7 @@ import { wallpaperLayout, WALLPAPER_THEMES, WALLPAPER_INKS, wallpaperInk } from 
 import { FONT_FAMILIES } from './renderer.js';
 import { paintPaper, paintPaperTexture } from './paper.js';
 import { drawSeal } from './seal.js';
+import { resolveSealFont } from './seal-font.js';
 import { loadBodyFont, bodyFontState, BODY_FONTS } from './body-fonts.js';
 import { WALLPAPER_QUOTES, WALLPAPER_CATEGORIES, quoteLayout, restoredQuoteLayout } from './wallpaper-quotes.js';
 
@@ -34,10 +35,10 @@ export function drawWallpaper(canvas, state, inherited) {
       ctx.fillText(char,(m.actualBoundingBoxLeft-m.actualBoundingBoxRight)/2,(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2);ctx.restore();
     }
   }
-  const stamp = characters(state.seal,true).slice(0,4);
+  const seal = resolveSealFont(state.seal, inherited), stamp = seal.chars;
   if(stamp.length && g.columns.length) {
     const plate=document.createElement('canvas');
-    drawSeal(plate,stamp,{...inherited,seed:1781});
+    drawSeal(plate,stamp,{...inherited,sealRenderFont:seal.renderFont,seed:1781});
     ctx.drawImage(plate,g.seal.x-g.seal.size/2,g.seal.y-g.seal.size/2,g.seal.size,g.seal.size);
   }
   const author=characters(state.author,true);
@@ -101,7 +102,7 @@ export function initWallpaperStudio({getSettings,notify}) {
       const id=fontId(), status=bodyFontState(id).status;
       if(BODY_FONTS[id] && status==='idle')loadBodyFont(id).then(update).catch(update);
       const waiting=BODY_FONTS[id] && status!=='ready';
-      const waitingSeal=!!state.seal.trim() && inherited.sealFont==='seal' && inherited.sealPending;
+      const seal=resolveSealFont(state.seal,inherited), waitingSeal=seal.pending;
       $('wpDownload').disabled=!valid||busy||waiting||waitingSeal;
       $('wpInspect').disabled=!valid;
       if(waiting)$('wpStatus').textContent=status==='error'?'字体未能加载，请换一种字体后保存。':'正在准备字体，就绪后即可保存。';
@@ -110,6 +111,10 @@ export function initWallpaperStudio({getSettings,notify}) {
         const coverage=bodyFontState(id).coverage;
         const missing=[...new Set(characters(state.main+state.sub,true))].filter(c=>coverage && !coverage.has(c.codePointAt(0)));
         if(missing.length)$('wpStatus').textContent+=`「${missing.slice(0,6).join('、')}」等 ${missing.length} 字将使用设备后备字体。`;
+      }
+      if(seal.chars.length && !waitingSeal) {
+        if(inherited.sealFont==='seal' && inherited.sealReady===false)$('wpStatus').textContent+=' 篆书加载失败，印章整方暂用楷体。';
+        else if(seal.missing.length)$('wpStatus').textContent+=` 印章字体缺「${seal.missing.join('、')}」，整方暂用楷体。`;
       }
       try {localStorage.setItem('shufa-wallpaper-v1',JSON.stringify({...Object.fromEntries(ids.map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value])),layout,theme,category,version:2}));}catch{$('wpStatus').textContent+=' 本机存储不可用。';}
     } catch(error) {

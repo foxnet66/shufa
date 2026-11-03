@@ -322,7 +322,7 @@ function renderHero() {
   drawPage($('heroArtwork'), pages[0], hero, 0, pages.length, 1800);
 }
 renderHero();
-wallpaperStudio = initWallpaperStudio({ getSettings:() => ({...settings, sealPending:sealLoading}), notify:toast });
+wallpaperStudio = initWallpaperStudio({ getSettings:() => ({...settings, sealPending:sealLoading, sealReady, customSealCoverage}), notify:toast });
 loadBodyFont('mashan').then(renderHero).catch(() => {});
 document.fonts.ready.then(renderCurrentPage);
 const builtinSeal = new FontFace('CNSSeal', `url("${new URL('./fonts/CNS-ShuoWen.ttf', import.meta.url).href}")`);

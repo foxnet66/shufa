@@ -3,6 +3,8 @@ node_modules/
 *.log
 artifacts/
 outputs/
+output/playwright/
+.playwright-cli/
 .openai/
 .codex/
 .agents/
