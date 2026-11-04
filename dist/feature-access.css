@@ -1,0 +1,21 @@
+.invite-option::after { content:'邀请试用'; display:block; font-size:11px; font-weight:400; letter-spacing:.06em; color:#8b6551; margin-top:4px; }
+.hero-work-scene .hero-stilllife { cursor:default; }
+.hero-sample-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:18px; }
+.hero-work-scene .hero-sample-footer .specimen-caption { margin:0; text-align:left; }
+.hero-sample-entry { display:flex; align-items:center; gap:12px; margin-left:auto; }
+.hero-sample-entry>span { color:#756453; font:12px/1.6 var(--ui); }
+.hero-work-scene .hero-sample-action { width:auto; padding:10px 16px; border:1px solid #9b8260; border-radius:2px; background:#faf7ee; color:#59442f; font:14px/1.5 var(--ui); cursor:pointer; }
+.hero-work-scene .hero-sample-action:hover:not(:disabled) { background:#eee7d7; border-color:#735435; }
+.hero-sample-action.invite-option::after { content:none; }
+.access-dialog { border:1px solid #c9b995; border-radius:3px; padding:32px; width:min(420px,calc(100vw - 32px)); box-sizing:border-box; background:#f8f5eb; color:#4d392c; box-shadow:0 20px 80px #241b1733; }
+.access-dialog::backdrop { background:#28221966; }
+.access-dialog h2 { font-family:serif; font-size:25px; font-weight:500; margin:0 0 16px; }
+.access-dialog p { line-height:1.8; font-size:14px; }
+.access-dialog label { display:block; margin:20px 0 8px; }
+.access-dialog input { box-sizing:border-box; width:100%; padding:12px; font-size:18px; letter-spacing:.08em; background:#fffdf6; color:#382d24; border:1px solid #b6a785; border-radius:2px; }
+.access-dialog input[aria-invalid=true] { border-color:#a43b30; }
+.access-dialog .access-message { min-height:24px; color:#a43b30; margin:8px 0; }
+.access-actions { display:flex; gap:12px; }
+.access-actions button { flex:1; padding:12px; cursor:pointer; }
+.access-dialog .access-note { color:#756453; margin-bottom:0; font-size:12px; }
+@media print { .access-dialog { display:none!important; } }

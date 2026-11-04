@@ -1,0 +1,9 @@
+.git/
+.vercel/
+node_modules/
+artifacts/
+outputs/
+.env
+.env.*
+!.env.example
+docs/media/

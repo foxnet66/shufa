@@ -11,6 +11,10 @@ import { initStudioUI } from './studio-ui.js';
 import { MOUNTS, mountGeometry } from './mounting.js';
 import { CLASSICS_BY_ID as samples } from './classics.js';
 import { initClassicsLibrary } from './classics-ui.js';
+import { accessReady, normalizeEditor, preserveDraft, onAccessChange, hasAdvancedAccess } from './feature-access.js';
+import { pdfFeature } from './feature-policy.js';
+
+await accessReady;
 
 const $ = id => document.getElementById(id);
 const fields = ['title', 'author', 'body', 'font', 'paper', 'columns', 'rows', 'natural', 'punctuation', 'colophon', 'seal', 'lineMode', 'ink', 'composition', 'sealStyle', 'sealFont', 'sealTexture', 'mount', 'scene'];
@@ -70,7 +74,7 @@ function restoreDraft() {
 
 function saveDraft() {
   try {
-    localStorage.setItem('zizai-shufa-v1', JSON.stringify({ ...settings, rows: $('rows').value, font: settings.font === 'custom' ? 'kai' : settings.font, sealFont: settings.sealFont === 'custom' ? 'kai' : settings.sealFont }));
+    localStorage.setItem('zizai-shufa-v1', JSON.stringify(preserveDraft({ ...settings, rows: $('rows').value, font: settings.font === 'custom' ? 'kai' : settings.font, sealFont: settings.sealFont === 'custom' ? 'kai' : settings.sealFont })));
     $('saveStatus').textContent = '草稿已存';
   } catch { $('saveStatus').textContent = '草稿未保存'; }
 }
@@ -81,6 +85,9 @@ function syncButtons() {
   const awaitingBody = BODY_FONTS[settings?.font] && bodyFontState(settings.font).status !== 'ready';
   $('download').disabled = empty || busy || awaitingFont || awaitingBody;
   $('print').disabled = empty || busy || awaitingFont || awaitingBody;
+  const restrictedPdf = !hasAdvancedAccess() && pdfFeature(layout?.pages.length);
+  if (restrictedPdf) $('print').dataset.inviteFeature = 'pdf'; else delete $('print').dataset.inviteFeature;
+  $('print').classList.toggle('invite-option', !!restrictedPdf);
   $('inspectArtwork').disabled = empty || busy;
   $('previousPage').disabled = empty || pageIndex === 0 || busy;
   $('nextPage').disabled = empty || pageIndex >= layout.pages.length - 1 || busy;
@@ -275,7 +282,7 @@ async function withExport(action) {
   update();
   if (!layout?.pages.length || busy) return;
   busy = true; syncButtons();
-  const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk, #scene, #heroSample')];
+  const controls = [...document.querySelectorAll('.editor input, .editor textarea, .editor select, .editor button, #newInk, #scene, #heroSample, #inviteUnlock, #inviteLogout')];
   const disabledBeforeExport = controls.map(control => control.disabled);
   controls.forEach(control => { control.disabled = true; });
   try { await loadBodyFont(settings.font); await document.fonts.ready; await action(); }
@@ -314,7 +321,8 @@ $('print').addEventListener('click', () => withExport(async () => {
   } finally { $('print').textContent = '整篇 PDF'; }
 }));
 window.addEventListener('afterprint', () => $('printRoot').replaceChildren());
-initStudioUI(); restoreDraft(); initClassicsLibrary(loadClassic); update();
+initStudioUI(); restoreDraft(); normalizeEditor(); initClassicsLibrary(loadClassic); update();
+onAccessChange(update);
 
 function renderHero() {
   const hero = { ...settings, ...samples.lanting, composition:'scroll', columns:24, rows:14, font:'mashan', bodyRenderFont:bodyFontState('mashan').status === 'ready' ? 'mashan' : 'kai', paper:'white', mount:'silk', style:'clean', lineMode:'flow', keepPunctuation:false, natural:true, seal:'自在', sealFont:'seal', sealRenderFont:sealReady ? 'seal' : 'kai', sealStyle:'intaglio', sealTexture:'fresh', colophon:'', ink:'balanced', seed:915 };

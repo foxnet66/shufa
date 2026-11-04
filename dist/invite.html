@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f6f3e9">
+  <title>一纸相邀 · 字里行间</title>
+  <link rel="icon" href="./favicon.svg?v=zi-brush-1" type="image/svg+xml">
+  <link rel="stylesheet" href="./invite.css">
+  <script type="module" src="./invite.js"></script>
+</head>
+<body>
+  <main class="invitation">
+    <a class="invite-brand" href="./"><img src="./favicon.svg?v=zi-brush-1" width="46" height="46" alt=""><span>字里行间</span></a>
+    <p class="invite-kicker">邀请试用</p>
+    <h1>一纸相邀</h1>
+    <p class="invite-intro">输入朋友分享的邀请码，<br>解锁更多章法与配色。</p>
+    <form id="inviteForm">
+      <label for="inviteCode">邀请码</label>
+      <input id="inviteCode" name="code" type="text" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="inviteMessage" required>
+      <p id="inviteMessage" class="invite-message" role="status" aria-live="polite"></p>
+      <button id="inviteSubmit" type="submit">解锁试用</button>
+    </form>
+    <p class="invite-note">无需注册 · 这台设备可记住 30 天</p>
+    <p class="invite-note"><a href="./">直接开始基础创作</a></p>
+    <noscript>请启用 JavaScript 后输入邀请码。</noscript>
+  </main>
+</body>
+</html>

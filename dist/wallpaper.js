@@ -6,6 +6,7 @@ import { drawSeal } from './seal.js';
 import { resolveSealFont } from './seal-font.js';
 import { loadBodyFont, bodyFontState, BODY_FONTS } from './body-fonts.js';
 import { WALLPAPER_QUOTES, WALLPAPER_CATEGORIES, quoteLayout, restoredQuoteLayout } from './wallpaper-quotes.js';
+import { hasAdvancedAccess, onAccessChange } from './feature-access.js';
 
 export function drawWallpaper(canvas, state, inherited) {
   const g = wallpaperLayout(state), theme = WALLPAPER_THEMES[state.theme] || WALLPAPER_THEMES.xuan;
@@ -65,7 +66,7 @@ export function initWallpaperStudio({getSettings,notify}) {
       if(WALLPAPER_THEMES[saved.theme])theme=saved.theme;
     }
   } catch {}
-  const read=()=>({main:$('wpMain').value,sub:$('wpSub').value,author:$('wpAuthor').value,seal:$('wpSeal').value,font:$('wpFont').value,ratio:$('wpRatio').value,safeTop:Number($('wpSafeTop').value),ink:$('wpInk').value,layout,theme});
+  const read=()=>({main:$('wpMain').value,sub:$('wpSub').value,author:$('wpAuthor').value,seal:$('wpSeal').value,font:$('wpFont').value,ratio:$('wpRatio').value,safeTop:Number($('wpSafeTop').value),ink:hasAdvancedAccess() || ['auto','ink'].includes($('wpInk').value)?$('wpInk').value:'auto',layout,theme:hasAdvancedAccess()?theme:'xuan'});
   let autoAuthor=!!matchingQuote();
   function showQuotes() {
     document.querySelectorAll('[data-wp-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpCategory===category)));
@@ -83,12 +84,12 @@ export function initWallpaperStudio({getSettings,notify}) {
   function update() {
     clearTimeout(timer); const state=read(), inherited=getSettings();
     $('wpClockOverlay').hidden=!$('wpClock').checked;
-    $('wpPhone').dataset.theme=theme;
-    document.querySelectorAll('[data-wp-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpTheme===theme)));
+    $('wpPhone').dataset.theme=state.theme;
+    document.querySelectorAll('[data-wp-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpTheme===state.theme)));
     document.querySelectorAll('[data-wp-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wpLayout===layout)));
     document.querySelectorAll('[data-wp-ink]').forEach(b=>{
       b.setAttribute('aria-pressed',String(b.dataset.wpInk===state.ink));
-      b.style.setProperty('--wp-ink',wallpaperInk(theme,b.dataset.wpInk));
+      b.style.setProperty('--wp-ink',wallpaperInk(state.theme,b.dataset.wpInk));
     });
     $('wpInkNote').textContent=(WALLPAPER_INKS[state.ink] || WALLPAPER_INKS.auto).description+' 正文与落款共用此色，印泥独立。';
     $('wpMainLabel').textContent=layout==='paired'?'上句':'主句';
@@ -157,5 +158,6 @@ export function initWallpaperStudio({getSettings,notify}) {
   document.fonts.addEventListener('loadingdone',update);
   // Refresh inherited fonts and seal settings after the main editor changes.
   document.querySelector('.editor').addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(update,250);});
+  onAccessChange(update);
   showQuotes();update();return {update};
 }

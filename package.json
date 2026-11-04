@@ -7,6 +7,10 @@
   "scripts": {
     "dev": "node server.mjs",
     "start": "node server.mjs",
+    "dev:invite": "node --env-file=.env.local server.mjs",
+    "invite:setup": "node scripts/setup-invite.mjs",
+    "invite:rotate": "node scripts/setup-invite.mjs --rotate",
+    "invite:off": "node scripts/setup-invite.mjs --disable",
     "test": "node --test tests/*.test.mjs",
     "corpus:build": "node scripts/build-classics.mjs"
   },

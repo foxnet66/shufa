@@ -6,25 +6,29 @@
   <meta name="description" content="字里行间，一纸诗文，几许心意。免费的开源书法排版工具，选择字体、宣纸与装裱，生成竖排诗文与诗笺壁纸，下载高清作品。">
   <meta name="theme-color" content="#f6eddd">
   <title>字里行间 · 书法排版与诗笺壁纸</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="./favicon.svg?v=zi-brush-1" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./studio.css">
   <link rel="stylesheet" href="./wallpaper.css">
   <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./feature-access.css">
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="字里行间首页"><img class="brand-mark" src="./favicon.svg" width="48" height="48" alt=""><span>字里行间</span></a>
-    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头</a><a href="#wallpaper">诗笺壁纸</a></nav>
+    <a class="brand" href="./" aria-label="字里行间首页"><img class="brand-mark" src="./favicon.svg?v=zi-brush-1" width="48" height="48" alt=""><span>字里行间</span></a>
+    <nav class="header-links" aria-label="书房导航"><a href="#desk">案头</a><a href="#wallpaper">诗笺壁纸</a><button id="inviteUnlock" class="text-button" type="button" hidden>邀请试用</button><button id="inviteLogout" class="text-button" type="button" hidden>退出试用</button></nav>
   </header>
   <main>
     <section class="intro" aria-label="书法创作介绍">
       <div class="hero-copy"><h1>展卷，<em>落墨。</em></h1><a class="hero-link" href="#desk">开始书写</a></div>
       <div class="hero-specimen hero-work-scene">
-        <button type="button" id="heroSample" class="hero-stilllife" aria-label="载入《兰亭集序》长卷示例">
+        <div class="hero-stilllife">
           <canvas id="heroArtwork" width="1800" height="1000" role="img" aria-label="兰亭集序长卷，本站排版实作"></canvas>
-        </button>
-        <span class="specimen-caption">兰亭集序 · 展卷试写</span>
+        </div>
+        <div class="hero-sample-footer">
+          <span class="specimen-caption">兰亭集序 · 长卷示例</span>
+          <div class="hero-sample-entry"><span id="heroInviteHint">需邀请码</span><button type="button" id="heroSample" class="hero-sample-action" aria-describedby="heroInviteHint">解锁长卷试写</button></div>
+        </div>
       </div>
     </section>
     <div class="desk-heading" id="desk"><div><h2>案头</h2></div></div>
@@ -113,6 +117,15 @@
   </dialog>
   <dialog id="wpDialog" class="wp-dialog" aria-label="壁纸放大鉴赏"><button id="wpClose" type="button" autofocus>收起</button><canvas id="wpLarge" role="img" aria-label="壁纸大图"></canvas></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
+  <dialog id="accessDialog" class="access-dialog" aria-labelledby="accessTitle" aria-describedby="accessIntro">
+    <h2 id="accessTitle">一纸相邀</h2>
+    <p id="accessIntro">输入朋友分享的邀请码，解锁长卷、装裱、印章进阶、多页 PDF 与壁纸高级配色。</p>
+    <form id="accessForm"><label for="accessCode">邀请码</label>
+      <input id="accessCode" name="code" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="accessMessage" required>
+      <p id="accessMessage" class="access-message" role="status" aria-live="polite"></p>
+      <div class="access-actions"><button id="accessCancel" class="secondary-button" type="button">继续基础创作</button><button id="accessSubmit" class="primary-button" type="submit">解锁试用</button></div>
+    </form><p class="access-note">无需注册 · 记住 30 天 · 当前作品留在案头</p>
+  </dialog>
   <div id="printRoot" aria-hidden="true"></div>
 </body>
 </html>
